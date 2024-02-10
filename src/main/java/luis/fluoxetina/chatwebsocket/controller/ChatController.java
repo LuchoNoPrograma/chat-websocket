@@ -18,7 +18,7 @@ public class ChatController {
   private final ChatMessageService chatMessageService;
 
   @MessageMapping("/chat.send-message")
-  @SendTo("/topic/public")
+  @SendTo("/topic/subscribe")
   public ChatMessageDto sendMessage(@Payload ChatMessageDto chatMessageDto) {
     ChatMessage chatMessagePersisted = chatMessageService.save(chatMessageMapper.toDocument(chatMessageDto));
 
