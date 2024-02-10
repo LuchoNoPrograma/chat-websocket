@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.ZonedDateTime;
 
-@Document
+@Document(collection = "chatMessages")
 @Data
 @Builder
 @NoArgsConstructor
