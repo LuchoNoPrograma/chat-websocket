@@ -1,0 +1,7 @@
+server:
+  port: 8081
+
+spring:
+  profiles:
+    default: dev
+    active: ${SPRING_PROFILES_ACTIVE}
