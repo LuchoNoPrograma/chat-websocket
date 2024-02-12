@@ -3,6 +3,14 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+src/chat-frontend/dist/**
+src/chat-frontend/node_modules/**
+src/chat-frontend/node
+src/chat-frontend/.idea
+src/chat-frontend/*.iws
+src/chat-frontend/*.iml
+src/chat-frontend/*.ipr
+
 
 ### STS ###
 .apt_generated
