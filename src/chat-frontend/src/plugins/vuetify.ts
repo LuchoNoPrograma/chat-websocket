@@ -23,7 +23,7 @@ export default createVuetify({
     directives,
 
     theme: {
-        defaultTheme: 'BLUE_THEME',
+        defaultTheme: 'AQUA_THEME',
         themes: {
             BLUE_THEME,
             AQUA_THEME,
@@ -40,17 +40,33 @@ export default createVuetify({
         }
     },
     defaults: {
+        VAutocomplete: {
+            variant: 'outlined',
+            density: 'compact',
+            color: 'primary'
+        },
         VCard: {
-            rounded: 'md'
+            rounded: 'md',
+            color: 'cardBg'
+        },
+        VFileInput: {
+            variant: 'outlined',
+            density: 'compact',
+            color: 'primary'
+        },
+        VInput: {
+            variant: 'outlined',
+            density: 'compact',
+            color: 'primary'
         },
         VTextField: {
             variant: 'outlined',
-            density: 'comfortable',
+            density: 'compact',
             color: 'primary'
         },
         VTextarea: {
             variant: 'outlined',
-            density: 'comfortable',
+            density: 'compact',
             color: 'primary'
         },
         VSelect: {

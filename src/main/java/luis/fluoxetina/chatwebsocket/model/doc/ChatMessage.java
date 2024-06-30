@@ -1,6 +1,10 @@
 package luis.fluoxetina.chatwebsocket.model.doc;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import luis.fluoxetina.chatwebsocket.enums.MessageFormat;
 import luis.fluoxetina.chatwebsocket.enums.MessageType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,9 +20,11 @@ public class ChatMessage {
   @Id
   private String id;
 
-  private String sender;
-  private String content;
-  private MessageType type;
+  private String roomId;
+  private String userId;
 
-  private ZonedDateTime sendDate;
+  private String body;
+  private MessageType type;
+  private MessageFormat format;
+  private ZonedDateTime createdAt;
 }

@@ -6,6 +6,9 @@ const sDrawer = ref(false);
 </script>
 
 <template>
+    <div v-if="$slots.top()">
+      <slot name="top"></slot>
+    </div>
     <!---/Left chat list -->
     <div class="d-flex mainbox">
         <div class="left-part" v-if="lgAndUp && $.slots.leftpart">
@@ -41,7 +44,7 @@ const sDrawer = ref(false);
 }
 .left-part {
     width: 320px;
-    border-right: 1px solid rgb(var(--v-theme-borderColor));
+    /*border-right: 1px solid rgb(var(--v-theme-borderColor));*/
     min-height: 500px;
     transition: 0.1s ease-in;
     flex-shrink: 0;

@@ -41,7 +41,7 @@ const DARK_AQUA_THEME: ThemeTypes = {
         'border-color': '#333F55',
     },
     colors: {
-        primary: '#0074BA',
+        primary: '#31a1e7',
         secondary: '#47D7BC',
         info: '#539BFF',
         success: '#13DEB9',
@@ -63,8 +63,7 @@ const DARK_AQUA_THEME: ThemeTypes = {
         hoverColor: '#333f55',
         surface: '#171c23',
         'on-surface-variant': '#171c23',
-        grey100: '#333F55',
-        grey200: '#465670'
+        cardBg: '#29303b',
     }
 };
 

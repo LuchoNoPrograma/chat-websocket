@@ -2,8 +2,9 @@ package luis.fluoxetina.chatwebsocket.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import luis.fluoxetina.chatwebsocket.enums.MessageType;
-import luis.fluoxetina.chatwebsocket.model.doc.ChatMessage;
+import luis.fluoxetina.chatwebsocket.model.doc.User;
+import luis.fluoxetina.chatwebsocket.model.service.UserService;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
@@ -14,19 +15,19 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @Log4j2
 public class WebSocketEventListener {
   private final SimpMessageSendingOperations messageTemplate;
-  public void handleWebSocketDisconnectListener(SessionDisconnectEvent event){
+  private final UserService userService;
+
+  /*@EventListener
+  public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
     StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
     String username = (String) headerAccessor.getSessionAttributes().get("username");
 
 
-    if(username != null){
+    if (username != null) {
       log.info("User Disconnected: {}", username);
-      ChatMessage chatMessage = ChatMessage.builder()
-        .sender(username)
-        .type(MessageType.LEAVE)
-        .build();
+      User user = userService.disconnect(username);
 
-      messageTemplate.convertAndSend("/topic/public", chatMessage);
+      messageTemplate.convertAndSend("/topic/user", user);
     }
-  }
+  }*/
 }

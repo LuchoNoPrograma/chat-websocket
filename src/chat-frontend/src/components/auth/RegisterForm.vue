@@ -30,12 +30,12 @@ watch(username, (newValue) => {
             <span class="bg-surface px-5 py-3 position-relative">Inicia sesión</span>
         </div>
     </div>
-    <v-form ref="form" v-model="valid" class="mt-5" lazy-validation>
+    <v-form ref="form" v-model="valid" class="mt-5" lazy-validation @submit.prevent="sendData">
         <v-label class="text-subtitle-1 font-weight-medium pb-2">Nombre de usuario</v-label>
         <v-text-field v-model="username" :rules="usernameRules" required></v-text-field>
 
         <div class="d-flex justify-center mt-4">
-          <v-btn variant="elevated" color="primary" append-icon="mdi-comment-arrow-right" @click="sendData">Unirse al chat</v-btn>
+          <v-btn variant="elevated" color="primary" append-icon="mdi-comment-arrow-right" type="submit">Unirse al chat</v-btn>
         </div>
     </v-form>
 </template>

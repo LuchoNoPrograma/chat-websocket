@@ -5,22 +5,25 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import luis.fluoxetina.chatwebsocket.enums.MessageFormat;
-import luis.fluoxetina.chatwebsocket.enums.MessageType;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ChatMessageDto {
-  private String userId;
-  private String roomId;
+public class RoomDto {
+  private String id;
+  private String name;
+  private String description;
 
-  private String body;
-  private MessageType type;
-  private MessageFormat format;
+  //Handle img in base64
+  private String imgPortrait;
   private ZonedDateTime createdAt;
+
+  private List<TagDto> tags;
+  private List<UserDto> users;
+  private List<ChatMessageDto> chatMessages;
 }

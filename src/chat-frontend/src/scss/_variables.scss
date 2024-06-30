@@ -6,6 +6,7 @@
 // Custom Variables
 // colors
 $white: #fff !default;
+$primary: #1e88e5 !default;
 
 // cards
 $card-title-size: 18px !default;
@@ -23,7 +24,7 @@ $box-shadow: rgba(145 158 171 / 30%) 0px 0px 2px 0px, rgba(145 158 171 / 12%) 0p
 @forward 'vuetify/settings' with (
     $color-pack: false !default,
     // Global font size and border radius
-    $font-size-root: 1rem,
+    $font-size-root: 0.825rem,
     $border-radius-root: $border-radius-root,
     $body-font-family: $body-font-family,
     $heading-font-family: $body-font-family !default,
@@ -49,7 +50,7 @@ $box-shadow: rgba(145 158 171 / 30%) 0px 0px 2px 0px, rgba(145 158 171 / 12%) 0p
                 'font-family': inherit
             ),
             'h4': (
-                'size': 1.3125rem,
+                'size': 1.3725rem,
                 'weight': 500,
                 'line-height': 1.6rem,
                 'font-family': inherit
@@ -140,7 +141,7 @@ $box-shadow: rgba(145 158 171 / 30%) 0px 0px 2px 0px, rgba(145 158 171 / 12%) 0p
 
     // 👉 Card
     // $card-color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity)) !default,
-    $card-elevation: 10 !default,
+  $card-elevation: 10 !default,
     $card-title-line-height: 1.6 !default,
     $card-text-padding: 24px !default,
     $card-item-padding: 30px 30px 24px !default,

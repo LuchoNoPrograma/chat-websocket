@@ -1,35 +1,43 @@
 package luis.fluoxetina.chatwebsocket.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import luis.fluoxetina.chatwebsocket.dto.ChatMessageDto;
+import luis.fluoxetina.chatwebsocket.mapper.ChatMessageMapper;
 import luis.fluoxetina.chatwebsocket.model.doc.ChatMessage;
 import luis.fluoxetina.chatwebsocket.model.service.ChatMessageService;
-import luis.fluoxetina.chatwebsocket.util.ChatMessageMapper;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.stereotype.Controller;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@Log4j2
 public class ChatController {
   private final ChatMessageMapper chatMessageMapper;
   private final ChatMessageService chatMessageService;
+  private final SimpMessagingTemplate messagingTemplate;
 
   @MessageMapping("/chat.send-message")
-  @SendTo("/topic/subscribe")
-  public ChatMessageDto sendMessage(@Payload ChatMessageDto chatMessageDto) {
+  public void sendMessage(@Payload ChatMessageDto chatMessageDto) {
     ChatMessage chatMessagePersisted = chatMessageService.save(chatMessageMapper.toDocument(chatMessageDto));
 
-    return chatMessageMapper.toDto(chatMessagePersisted);
+    log.info("Message sent: {}", chatMessagePersisted);
+    chatMessageMapper.toDto(chatMessagePersisted);
+
+    messagingTemplate.convertAndSend("/topic/chat/" + chatMessageDto.getRoomId(), chatMessageMapper.toDto(chatMessagePersisted));
   }
 
 
   @MessageMapping("/chat.add-user")
-  @SendTo("/topic/public")
+  @SendTo("/topic/chat")
   public ChatMessageDto addUser(@Payload ChatMessageDto chatMessageDto, SimpMessageHeaderAccessor headerAccessor) {
-    headerAccessor.getSessionAttributes().put("username", chatMessageDto.getSender());
+
+    log.info("Adding user: {}", chatMessageDto.getUserId());
+    headerAccessor.getSessionAttributes().put("username", chatMessageDto.getUserId());
     return chatMessageDto;
   }
 }

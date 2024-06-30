@@ -11,7 +11,7 @@ import {
     LayoutSidebarLeftCollapseIcon
 } from 'vue-tabler-icons';
 
-const theme = useTheme();
+const themeStore = useTheme();
 const customizer = useCustomizerStore();
 
 // themes color options
@@ -62,7 +62,7 @@ const DarkthemeColors = ref([
         <h5 class="text-h5">Settings</h5>
     </div>
     <v-divider></v-divider>
-    <perfect-scrollbar style="height: calc(100vh - 90px)">
+    <perfect-scrollbar style="  height: calc(100vh - 90px)">
         <div class="pa-6">
             <h6 class="text-h6 mb-2">Sidebar Layout</h6>
             <v-btn-toggle v-model="customizer.setHorizontalLayout" color="primary" class="my-2 btn-group-custom gap-3" rounded="0" group>

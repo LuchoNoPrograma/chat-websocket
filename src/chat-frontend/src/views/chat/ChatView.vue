@@ -1,48 +1,70 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
 // common components
-import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import AppBaseCard from '@/components/shared/AppBaseCard.vue';
 import ChatListing from '@/components/apps/chats/ChatListing.vue';
-import ChatDetail from '@/components/apps/chats/ChatDetail.vue';
 import ChatProfile from '@/components/apps/chats/ChatProfile.vue';
+import {useChatStore} from "@/stores/apps/chat";
+import {useRouter} from "vue-router";
+import ChatHeader from "@/components/apps/chats/ChatHeader.vue";
 
-// theme breadcrumb
-const page = ref({ title: 'Chat App' });
+const chatStore = useChatStore();
+const router = useRouter();
 
-const breadcrumbs = ref([
-    {
-        title: 'Messenger',
-        disabled: true,
-        href: '#'
-    }
-]);
+
+const logout = async () => {
+  chatStore.disconnect();
+  await router.push('/auth/register')
+}
 </script>
 
 <template>
-    <!-- ---------------------------------------------------- -->
-    <!-- Table Basic -->
-    <!-- ---------------------------------------------------- -->
-    <BaseBreadcrumb :breadcrumbs="breadcrumbs" :title="page.title"></BaseBreadcrumb>
+  <app-base-card>
+    <template v-slot:top>
+      <chat-header></chat-header>
+    </template>
+    <template v-slot:leftpart>
+      <v-card class="d-flex flex-column justify-space-between h-100">
+        <v-container>
+          <h4 class="font-weight-medium">
+            Usuarios en linea ({{ chatStore.getUserOnlineList().length }})
+          </h4>
 
-    <v-card elevation="10">
-        <AppBaseCard>
-            <template v-slot:rightpart>
-                <ChatDetail />
-            </template>
+          <div>
+            <v-list style="background-color: transparent !important;">
+              <perfect-scrollbar class="h-100">
+                <v-list-item v-for="(user, index) in chatStore.getUserOnlineList()" :key="index"
+                             class="text-white">
+                  <div class="py-2 pl-4 w-100 d-flex align-center justify-space-between border border-md">
+                    <v-list-item-title>
+                      <span class="textPrimary">{{user.username}}</span>
+                    </v-list-item-title>
 
-            <template v-slot:mobileLeftContent>
-                <ChatProfile />
-                <ChatListing />
-            </template>
-        </AppBaseCard>
-    </v-card>
+                    <v-list-item>
+                      <v-btn icon size="30" varant="outlined">
+                        <v-icon icon="mdi-email-fast" size="20"></v-icon>
+                      </v-btn>
+                    </v-list-item>
+                  </div>
+                </v-list-item>
+              </perfect-scrollbar>
+            </v-list>
+          </div>
+        </v-container>
+      </v-card>
+    </template>
+
+    <template v-slot:rightpart>
+      <router-view>
+      </router-view>
+    </template>
+  </app-base-card>
 </template>
 
 <style lang="scss" scoped>
 @media (max-width: 1279px) {
-    .v-card {
-        position: unset;
-    }
+  .v-card {
+    position: unset;
+  }
 }
+
 </style>

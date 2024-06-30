@@ -23,7 +23,7 @@ const BLUE_THEME: ThemeTypes = {
         textPrimary: '#2A3547',
         textSecondary: '#2A3547',
         borderColor: '#e5eaef',
-        inputBorder: '#DFE5EF',
+        inputBorder: '#235198',
         containerBg: '#ffffff',
         background: '#eef5f9',
         hoverColor: '#f6f9fc',
@@ -64,7 +64,8 @@ const AQUA_THEME: ThemeTypes = {
         surface: '#fff',
         'on-surface-variant': '#fff',
         grey100: '#F2F6FA',
-        grey200: '#EAEFF4'
+        grey200: '#EAEFF4',
+        cardBg: '#fff',
     }
 };
 
