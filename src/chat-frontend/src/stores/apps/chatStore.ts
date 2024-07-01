@@ -26,7 +26,9 @@ export const useChatStore = defineStore('chat', () => {
   });
 
   const userOnlineList = ref<UserType[]>([]);
+
   const chatMessageContent = ref<string>();
+  const selectedRoom = ref<RoomType>();
 
   const connect = (username: string) => {
     const URL = import.meta.env.VITE_BACKEND_URL + '/ws-chatapp';
@@ -109,7 +111,9 @@ export const useChatStore = defineStore('chat', () => {
       sender: chatUser.value.username,
       body: chatMessageContent.value,
       type: MessageType.CHAT,
-      format: MessageFormat.TEXT
+      format: MessageFormat.TEXT,
+      roomId: selectedRoom.value?.id,
+      userId: userConnected.value?.username
     };
 
 
@@ -128,6 +132,10 @@ export const useChatStore = defineStore('chat', () => {
     return chatUser.value;
   };
 
+  const getChatRoom = () => {
+
+  }
+
   const getUserOnlineList = () => {
     return userOnlineList.value;
   }
@@ -136,5 +144,6 @@ export const useChatStore = defineStore('chat', () => {
     return roomList.value
   }
 
-  return {chatMessageContent, socket, connect, sendMessage, disconnect, getChatUser, getUserOnlineList, getRoomList, sendRoom};
+  return {chatMessageContent, socket, connect, selectedRoom,
+    sendMessage, disconnect, getChatUser, getUserOnlineList, getRoomList, sendRoom};
 });

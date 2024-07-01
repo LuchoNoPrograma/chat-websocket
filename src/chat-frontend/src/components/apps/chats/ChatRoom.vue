@@ -94,6 +94,7 @@ const createRoom = () => {
 }
 
 const enterRoom = async (room: RoomType) => {
+  chatStore.selectedRoom = room
   await router.push(`/room/${room.id}`)
 }
 </script>
