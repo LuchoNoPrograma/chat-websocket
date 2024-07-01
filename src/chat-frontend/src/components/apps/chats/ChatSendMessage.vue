@@ -1,25 +1,17 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { useChatStore } from '@/stores/apps/chat';
+import { useChatStore } from '@/stores/apps/chatStore';
 import type { ChatMessageType } from '@/types/apps/ChatMessageType';
-import { MessageFormat, MessageType } from '@/types/apps/ChatMessageType';
 
-
-const chatMessageContent = ref<ChatMessageType>();
 const chatStore = useChatStore();
 
-function addMessageTextAndClear(item: ChatMessageType) {
-    if (item.content?.length === 0) {
+const addMessageTextAndClear = (item: ChatMessageType) => {
+    if (item.body?.length === 0) {
         return;
     }
-    chatStore.sendMessage({
-        content: chatStore.chatMessageContent,
-        messageFormat: MessageFormat.TEXT,
-        messageType: MessageType.CHAT,
-        sendDate: new Date()
-    });
+    chatStore.sendMessage();
     chatStore.chatMessageContent = '';
 }
+
 </script>
 
 <template>
@@ -45,7 +37,7 @@ function addMessageTextAndClear(item: ChatMessageType) {
             <photo-icon size="20"></photo-icon>
         </v-btn>
         <v-btn class="text-medium-emphasis" icon variant="text">
-            <paperclip-icon size="20"></paperclip-icon>
+            <paperclip-icon size="20"></paperclip-icon>.
         </v-btn>
     </form>
 </template>

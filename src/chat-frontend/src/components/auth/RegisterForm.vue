@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
-import { useChatStore } from "@/stores/apps/chat";
+import { useChatStore } from "@/stores/apps/chatStore";
 import { useRouter } from "vue-router";
 
 const chatStore = useChatStore();

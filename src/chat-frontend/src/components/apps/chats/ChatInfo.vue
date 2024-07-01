@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useChatStore } from '@/stores/apps/chat';
+import { useChatStore } from '@/stores/apps/chatStore';
 import { uniq, flatten } from 'lodash';
 
 const props = defineProps({ chatDetail: Object });

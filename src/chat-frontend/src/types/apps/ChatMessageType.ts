@@ -43,8 +43,17 @@ export enum MessageFormat {
 export type ChatMessageType = {
     id?: string,
     sender?: string;
-    content?: string;
+    body?: string;
     type: MessageType;
-    messageFormat: MessageFormat;
+    format: MessageFormat;
     sendDate?: Date;
 };
+
+/*
+private String userId;
+private String roomId;
+
+private String body;
+private MessageType type;
+private MessageFormat format;
+private ZonedDateTime createdAt;*/

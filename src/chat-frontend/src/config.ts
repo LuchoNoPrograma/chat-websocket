@@ -16,8 +16,8 @@ const config: ConfigProps = {
     mini_sidebar: false,
     setHorizontalLayout: false, // Horizontal layout
     setRTLLayout: false, // RTL layout
-    actTheme: 'DARK_AQUA_THEME',
-    inputBg: 'DARK_AQUA_THEME',
+    actTheme: 'BLUE_THEME',
+    inputBg: 'BLUE_THEME',
     boxed: true,
     setBorderCard: true
 };

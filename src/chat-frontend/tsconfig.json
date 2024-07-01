@@ -1,14 +1,16 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.web.json",
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/**"]
     },
-    "allowJs": true
+    "allowJs": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "noEmit": true
   },
-
   "references": [
     {
       "path": "./tsconfig.vite-config.json"

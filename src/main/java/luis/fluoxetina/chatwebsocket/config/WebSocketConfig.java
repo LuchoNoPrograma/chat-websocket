@@ -12,17 +12,18 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-  @Override
-  public void configureMessageBroker(MessageBrokerRegistry config) {
-    config.enableSimpleBroker("/topic");
-    config.setApplicationDestinationPrefixes("/ws");
-  }
 
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
     registry.addEndpoint("/ws-chatapp")
-      .setAllowedOriginPatterns("*")
+      .setAllowedOriginPatterns("http://localhost:8080")
       .withSockJS();
+  }
+
+  @Override
+  public void configureMessageBroker(MessageBrokerRegistry config) {
+    config.setApplicationDestinationPrefixes("/ws");
+    config.enableSimpleBroker("/topic");
   }
 
   @Bean

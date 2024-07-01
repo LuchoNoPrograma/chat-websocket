@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue';
-import {useChatStore} from '@/stores/apps/chat';
+import {useChatStore} from '@/stores/apps/chatStore';
 import {formatDistanceToNowStrict} from 'date-fns';
-import ChatSendMsg from './ChatSendMsg.vue';
+import ChatSendMsg from './ChatSendMessage.vue';
 import {useDisplay} from 'vuetify';
 import {es} from 'date-fns/locale';
 
@@ -38,8 +38,7 @@ fetchData();
   <div class="customHeight">
     <v-card class="mx-4">
       <template v-slot:title>
-        <h3 class="font-weight-medium
-">
+        <h3 class="font-weight-medium">
           {{actualRoom?.name}}
         </h3>
       </template>

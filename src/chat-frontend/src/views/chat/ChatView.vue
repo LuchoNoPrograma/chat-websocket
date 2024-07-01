@@ -3,7 +3,7 @@
 import AppBaseCard from '@/components/shared/AppBaseCard.vue';
 import ChatListing from '@/components/apps/chats/ChatListing.vue';
 import ChatProfile from '@/components/apps/chats/ChatProfile.vue';
-import {useChatStore} from "@/stores/apps/chat";
+import {useChatStore} from "@/stores/apps/chatStore";
 import {useRouter} from "vue-router";
 import ChatHeader from "@/components/apps/chats/ChatHeader.vue";
 

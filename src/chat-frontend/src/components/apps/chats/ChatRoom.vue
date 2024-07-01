@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {useChatStore} from "@/stores/apps/chat";
+import {useChatStore} from "@/stores/apps/chatStore";
 import {computed, onMounted, ref} from "vue";
 import type {RoomType} from "@/types/model/RoomTypes";
 import {helpers, required} from "@vuelidate/validators";

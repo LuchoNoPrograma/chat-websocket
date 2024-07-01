@@ -107,10 +107,11 @@ export const useChatStore = defineStore('chat', () => {
   const sendMessage = () => {
     const chatMessage: ChatMessageType = {
       sender: chatUser.value.username,
-      content: chatMessageContent.value,
+      body: chatMessageContent.value,
       type: MessageType.CHAT,
-      messageFormat: MessageFormat.TEXT
+      format: MessageFormat.TEXT
     };
+
 
     stompClient.value?.send('/ws/chat.send-message', JSON.stringify(chatMessage));
     chatMessageContent.value = '';
