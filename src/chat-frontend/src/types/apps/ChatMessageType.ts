@@ -46,7 +46,7 @@ export type ChatMessageType = {
     body?: string;
     type: MessageType;
     format: MessageFormat;
-    sendDate?: Date;
+    createdAt?: Date;
 
     roomId?: string;
     userId?: string;

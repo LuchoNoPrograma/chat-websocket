@@ -122,13 +122,18 @@ export const useChatStore = defineStore('chat', () => {
     chatUser.value.chatHistory.push(chatMessage);
   };
 
-  const getChatUser = () => {
+  const getChatUser = async () => {
     if (!chatUser.value.username)
       chatUser.value = {
         username: 'User 1',
         chatHistory: chatUser.value.chatHistory
       };
 
+    const responseUser = await axiosServices<UserType>('/api/v1/user');
+    chatUser.value = {
+      username: responseUser.data.username,
+      chatHistory: chatUser.value.chatHistory
+    };
     return chatUser.value;
   };
 

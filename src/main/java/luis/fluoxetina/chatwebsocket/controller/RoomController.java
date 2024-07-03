@@ -5,7 +5,9 @@ import lombok.extern.log4j.Log4j2;
 import luis.fluoxetina.chatwebsocket.dto.RoomDto;
 import luis.fluoxetina.chatwebsocket.mapper.RoomMapper;
 import luis.fluoxetina.chatwebsocket.model.doc.Room;
+import luis.fluoxetina.chatwebsocket.model.service.ChatMessageService;
 import luis.fluoxetina.chatwebsocket.model.service.RoomService;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -23,6 +25,7 @@ import java.util.List;
 @CrossOrigin({"*"})
 public class RoomController {
   private final RoomService roomService;
+  private final ChatMessageService chatMessageService;
   private final RoomMapper roomMapper;
   private final SimpMessagingTemplate messagingTemplate;
 
@@ -48,6 +51,8 @@ public class RoomController {
 
   @GetMapping("/api/v1/room/{id}")
   public ResponseEntity<RoomDto> findById(@PathVariable String id) {
-    return ResponseEntity.ok(roomMapper.toDtoWithChatMessagesAndUsers(roomService.findById(id)));
+    Room room = roomService.findById(id);
+    room.setChatMessages(chatMessageService.findAllByRoomId(new ObjectId(room.getId())));
+    return ResponseEntity.ok(roomMapper.toDtoWithChatMessagesAndUsers(room));
   }
 }

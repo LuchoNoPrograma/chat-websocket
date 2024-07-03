@@ -26,7 +26,7 @@ const addMessageTextAndClear = (item: ChatMessageType) => {
             color="primary"
             density="compact"
             hide-details
-            placeholder="Type a Message"
+            placeholder="Mensaje"
             variant="solo"
         ></v-text-field>
         <v-btn :disabled="chatStore.chatMessageContent == undefined" class="text-medium-emphasis" icon type="submit" variant="text">

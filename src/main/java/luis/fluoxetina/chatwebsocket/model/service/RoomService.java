@@ -3,6 +3,7 @@ package luis.fluoxetina.chatwebsocket.model.service;
 import lombok.RequiredArgsConstructor;
 import luis.fluoxetina.chatwebsocket.exception.EntityNotFoundException;
 import luis.fluoxetina.chatwebsocket.model.doc.Room;
+import luis.fluoxetina.chatwebsocket.model.repository.ChatMessageRepository;
 import luis.fluoxetina.chatwebsocket.model.repository.RoomRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoomService {
   private final RoomRepository roomRepository;
+  private final ChatMessageRepository chatMessageRepository;
 
   public Room createRoom(Room room) {
     room.setCreatedAt(ZonedDateTime.now());

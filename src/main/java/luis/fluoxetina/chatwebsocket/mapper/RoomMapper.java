@@ -56,6 +56,9 @@ public class RoomMapper {
     if (room.getUsers() != null) {
       roomDto.setUsers(room.getUsers().stream().map(userMapper::toDto).toList());
     }
+    if(room.getChatMessages() != null) {
+      roomDto.setChatMessages(room.getChatMessages().stream().map(chatMessageMapper::toDto).toList());
+    }
 
     return roomDto;
   }

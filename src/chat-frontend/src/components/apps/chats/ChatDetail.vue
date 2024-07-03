@@ -29,6 +29,7 @@ function toggleRpart() {
 
 const fetchData = async () => {
   actualRoom.value = await roomStore.getRoomById(router.currentRoute.value.params.roomId as string)
+  console.log(actualRoom.value)
 }
 
 
@@ -48,23 +49,30 @@ fetchData();
     <v-container>
       <perfect-scrollbar class="rightpartHeight">
         <div class="d-flex flex-column">
-          <div v-for="chatMessage in chatStore.getChatUser().chatHistory" :key="chatMessage.id">
+          <div v-for="chatMessage in actualRoom?.chatMessages" :key="chatMessage.id" class="px-4 pt-4" style="border: 1px solid black">
             <div class="justify-end d-flex text-end mb-1">
               <div>
-                <small v-if="chatMessage.sendDate" class="text-medium-emphasis text-subtitle-2">
+                <v-sheet
+                    color="info"
+                    v-if="chatMessage.format === MessageFormat.TEXT"
+                    class="rounded-md px-3 py-2 mb-1"
+                >
+                  <p class="text-body-1">{{ chatMessage.body }}</p>
+                </v-sheet>
+                <small v-if="chatMessage" class="text-subtitle-1 ml-1">
                   Hace
                   {{
-                    formatDistanceToNowStrict(new Date(chatMessage.sendDate as any), {
+                    formatDistanceToNowStrict(new Date(chatMessage.createdAt as any), {
                       addSuffix: false,
                       locale: es
                     })
                   }}
                 </small>
                 <v-sheet v-if="chatMessage.type === MessageType.JOIN" class="mx-auto">
-                  {{ chatMessage.sender }} se ha unido!
+                  {{ chatMessage.userId }} se ha unido!
                 </v-sheet>
 
-                <v-sheet
+<!--                <v-sheet
                     v-if="chatMessage.messageFormat !== MessageFormat.IMG"
                     class="bg-grey100 rounded-md px-3 py-2 mb-1"
                 >
@@ -72,32 +80,33 @@ fetchData();
                 </v-sheet>
                 <v-sheet v-if="chatMessage.messageFormat === MessageFormat.IMG" class="mb-1">
                   <img :src="chatMessage.content" alt="pro" class="rounded-md" width="250"/>
-                </v-sheet>
+                </v-sheet>-->
               </div>
             </div>
-            <!--                        <div class="d-flex align-items-start gap-3 mb-1">
-    <div>
-        <small v-if="chatMessage.sendDate" class="text-medium-emphasis text-subtitle-2">
-            {{ chatMessage.sender }},
-            {{
-                formatDistanceToNowStrict(new Date(chatMessage.sendDate as any), {
-                    addSuffix: false
-                })
-            }}
-            ago
-        </small>
-
-        <v-sheet
-            v-if="chatMessage.messageFormat === MessageFormat.TEXT"
-            class="bg-grey100 rounded-md px-3 py-2 mb-1"
-        >
-            <p class="text-body-1">{{ chatMessage.content }}</p>
-        </v-sheet>
-        <v-sheet v-if="chatMessage.messageFormat === MessageFormat.IMG" class="mb-1">
-            <img :src="chatMessage.content" alt="pro" class="rounded-md" width="250" />
-        </v-sheet>
-    </div>
-</div>-->
+            <div class="d-flex align-items-start gap-3 mb-1">
+              <div>
+                <v-sheet
+                    elevation="10"
+                    v-if="chatMessage.format === MessageFormat.TEXT"
+                    color="surface"
+                    class="rounded-md px-3 py-2"
+                >
+                  <p class="text-body-1">{{ chatMessage.body }}</p>
+                </v-sheet>
+                <small v-if="chatMessage.createdAt" class="text-subtitle-1 ml-1">
+                  {{chatMessage.userId}},
+                  {{
+                    formatDistanceToNowStrict(new Date(chatMessage.createdAt as any), {
+                      addSuffix: false
+                    })
+                  }}
+                  ago
+                </small>
+<!--                <v-sheet v-if="chatMessage.format === MessageFormat.IMG" class="mb-1">
+                  <img :src="chatMessage.body" alt="pro" class="rounded-md" width="250"/>
+                </v-sheet>-->
+              </div>
+            </div>
           </div>
         </div>
       </perfect-scrollbar>

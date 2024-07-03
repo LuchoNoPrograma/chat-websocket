@@ -3,9 +3,12 @@ package luis.fluoxetina.chatwebsocket.model.service;
 import lombok.RequiredArgsConstructor;
 import luis.fluoxetina.chatwebsocket.model.doc.ChatMessage;
 import luis.fluoxetina.chatwebsocket.model.repository.ChatMessageRepository;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,5 +20,10 @@ public class ChatMessageService {
       chatMessage.setCreatedAt(ZonedDateTime.now());
     }
     return chatMessageRepository.save(chatMessage);
+  }
+
+  public List<ChatMessage> findAllByRoomId(ObjectId roomId) {
+    chatMessageRepository.findAllByRoomId(roomId).forEach(chatMessage -> System.out.println(chatMessage.getBody()));
+    return chatMessageRepository.findAllByRoomId(roomId);
   }
 }
