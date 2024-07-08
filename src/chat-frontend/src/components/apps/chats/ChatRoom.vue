@@ -10,6 +10,8 @@ import axiosServices from "@/utils/axios";
 import type {TagType} from "@/types/model/TagTypes";
 import useVuelidate from "@vuelidate/core";
 import {useRouter} from "vue-router";
+import type {Message} from "webstomp-client";
+import type {ChatMessageType} from "@/types/apps/ChatMessageType";
 
 
 const chatStore = useChatStore();
@@ -93,10 +95,11 @@ const createRoom = () => {
   chatStore.sendRoom(roomForm.value);
 }
 
+
 const enterRoom = async (room: RoomType) => {
-  chatStore.selectedRoom = room;
-  await router.push(`/room/${room.id}`)
+  await router.push(`/room/${room.id}`)//ChatDetail.vue
 }
+
 </script>
 
 <template>
@@ -108,15 +111,17 @@ const enterRoom = async (room: RoomType) => {
 
     <v-container>
       <v-row>
-        <v-col v-for="room in chatStore.getRoomList()" :key="room.id" cols="12" lg="4" md="6" sm="6" class="chat-room__item">
+        <v-col v-for="room in chatStore.getRoomList()" :key="room.id" cols="12" lg="4" md="6" sm="6"
+               class="chat-room__item">
           <v-card elevation="2">
             <template v-slot:default>
               <div class="pa-4">
-                <h4 class="text-h4 font-weight-semibold">{{room.name}}</h4>
-<!--                <p class="text-subtitle-1 my-1">{{room.description}}</p>-->
+                <h4 class="text-h4 font-weight-semibold">{{ room.name }}</h4>
+                <!--                <p class="text-subtitle-1 my-1">{{room.description}}</p>-->
                 <div class="mt-2">
                   <v-chip v-for="tag in room.tags" :key="tag.id" density="compact" class="mr-2">
-                    <span class="mr-1">{{tag.name}}</span> <v-icon :icon="tag.pathIcon"></v-icon>
+                    <span class="mr-1">{{ tag.name }}</span>
+                    <v-icon :icon="tag.pathIcon"></v-icon>
                   </v-chip>
                 </div>
               </div>
@@ -273,7 +278,7 @@ label[for="form-room__portrait-preview"] {
 }
 
 .chat-room__item {
-  img{
+  img {
     width: 100%;
     height: 100%;
   }

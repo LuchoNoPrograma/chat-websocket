@@ -52,7 +52,7 @@ public class RoomController {
   @GetMapping("/api/v1/room/{id}")
   public ResponseEntity<RoomDto> findById(@PathVariable String id) {
     Room room = roomService.findById(id);
-    room.setChatMessages(chatMessageService.findAllByRoomId(new ObjectId(room.getId())));
+    room.setChatMessages(chatMessageService.findAllByRoomId(id));
     return ResponseEntity.ok(roomMapper.toDtoWithChatMessagesAndUsers(room));
   }
 }

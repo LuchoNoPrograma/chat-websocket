@@ -41,7 +41,7 @@
         "vue3-apexcharts": "1.4.1",
         "vue3-carousel": "^0.2.9",
         "vue3-easy-data-table": "^1.4.19",
-        "vue3-perfect-scrollbar": "1.6.0",
+        "vue3-perfect-scrollbar": "2.0.0",
         "vue3-print-nb": "^0.1.4",
         "vue3-recaptcha-v2": "1.0.1",
         "vuedraggable": "^2.24.3",

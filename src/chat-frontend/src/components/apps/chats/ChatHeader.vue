@@ -32,7 +32,7 @@ const changeTheme = () => {
 </script>
 
 <template>
-  <v-app-bar id="top" color="primary" elevation="5" height="64">
+  <v-app-bar id="top" color="primary" elevation="0" height="60">
 
     <v-btn class="hidden-md-and-down " color="primary" icon variant="text">
       <menu2-icon size="25"></menu2-icon>

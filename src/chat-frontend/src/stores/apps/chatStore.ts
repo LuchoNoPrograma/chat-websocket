@@ -37,27 +37,27 @@ export const useChatStore = defineStore('chat', () => {
 
 
     stompClient.value.connect(
-      {},
-      async (frame) => {
-        connected.value = true;
-        const responseUser = await axiosServices<UserType[]>('/api/v1/user-online');
-        userOnlineList.value = responseUser.data;
-        console.log(frame);
+        {},
+        async (frame) => {
+          connected.value = true;
+          const responseUser = await axiosServices<UserType[]>('/api/v1/user-online');
+          userOnlineList.value = responseUser.data;
+          console.log(frame);
 
-        const responseRoom = await axiosServices<RoomType[]>('/api/v1/room');
-        roomList.value = responseRoom.data;
+          const responseRoom = await axiosServices<RoomType[]>('/api/v1/room');
+          roomList.value = responseRoom.data;
 
-        stompClient.value?.subscribe('/topic/user', onUserOnline);
-        stompClient.value?.subscribe('/topic/room', onRoomCreated);
+          stompClient.value?.subscribe('/topic/user', onUserOnline);
+          stompClient.value?.subscribe('/topic/room', onRoomCreated);
 
-        stompClient.value?.send(`/ws/user.connect/${username}`);
+          stompClient.value?.send(`/ws/user.connect/${username}`);
 
-        window.addEventListener('beforeunload', disconnect);
-      },
-      (error: Frame | CloseEvent) => {
-        console.log(error);
-        console.log('Error de conexión');
-      }
+          window.addEventListener('beforeunload', disconnect);
+        },
+        (error: Frame | CloseEvent) => {
+          console.log(error);
+          console.log('Error de conexión');
+        }
     );
   };
 
@@ -80,6 +80,7 @@ export const useChatStore = defineStore('chat', () => {
       userOnlineList.value.unshift(payload);
     } else {
       userOnlineList.value = userOnlineList.value.filter((user: UserType) => user.username !== payload.username);
+      userConnected.value = undefined;
     }
   }
 
@@ -97,14 +98,17 @@ export const useChatStore = defineStore('chat', () => {
   const sendRoom = (room: RoomType) => {
     console.log("Enviando imagen")
     room.imgPortrait = room.imgPreview?.src
-    stompClient.value?.send(`/ws/room.create-room`, JSON.stringify(room));
+    stompClient.value?.send('/ws/room.create-room', JSON.stringify(room));
   }
 
-
-  const onMessageReceived = (message: Message) => {
-    const payload: ChatMessageType = JSON.parse(message.body);
-    chatUser.value.chatHistory.push(payload);
-  };
+  const subscribeRoom = (room: RoomType, onChatUpdate: (body: ChatMessageType) => void) => {
+    selectedRoom.value = room;
+    stompClient.value?.subscribe(`/topic/chat/room/${room.id}`, (message: Message) => {
+      const payload: ChatMessageType = JSON.parse(message.body);
+      selectedRoom.value?.chatMessages?.push(payload)
+      onChatUpdate(payload);
+    });
+  }
 
   const sendMessage = () => {
     const chatMessage: ChatMessageType = {
@@ -116,10 +120,8 @@ export const useChatStore = defineStore('chat', () => {
       userId: userConnected.value?.username
     };
 
-
-    stompClient.value?.send('/ws/chat.send-message', JSON.stringify(chatMessage));
+    stompClient.value?.send('/ws/chat.send-message-room', JSON.stringify(chatMessage));
     chatMessageContent.value = '';
-    chatUser.value.chatHistory.push(chatMessage);
   };
 
   const getChatUser = async () => {
@@ -149,6 +151,8 @@ export const useChatStore = defineStore('chat', () => {
     return roomList.value
   }
 
-  return {chatMessageContent, socket, connect, selectedRoom,
-    sendMessage, disconnect, getChatUser, getUserOnlineList, getRoomList, sendRoom};
+  return {chatMessageContent, socket, stompClient, connect, selectedRoom, subscribeRoom,
+    sendMessage, disconnect, getChatUser, getUserOnlineList, getRoomList, sendRoom,
+    userConnected
+  };
 });

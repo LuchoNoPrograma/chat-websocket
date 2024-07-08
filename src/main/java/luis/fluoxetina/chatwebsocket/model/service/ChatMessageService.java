@@ -22,8 +22,7 @@ public class ChatMessageService {
     return chatMessageRepository.save(chatMessage);
   }
 
-  public List<ChatMessage> findAllByRoomId(ObjectId roomId) {
-    chatMessageRepository.findAllByRoomId(roomId).forEach(chatMessage -> System.out.println(chatMessage.getBody()));
+  public List<ChatMessage> findAllByRoomId(String roomId) {
     return chatMessageRepository.findAllByRoomId(roomId);
   }
 }

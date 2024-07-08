@@ -23,7 +23,7 @@ const logout = async () => {
       <chat-header></chat-header>
     </template>
     <template v-slot:leftpart>
-      <v-card class="d-flex flex-column justify-space-between h-100">
+      <v-card class="d-flex flex-column justify-space-between" style="height: 80vh">
         <v-container>
           <h4 class="font-weight-medium">
             Usuarios en linea ({{ chatStore.getUserOnlineList().length }})

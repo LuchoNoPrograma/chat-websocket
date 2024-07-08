@@ -6,11 +6,11 @@ const sDrawer = ref(false);
 </script>
 
 <template>
-    <div v-if="$slots.top()">
+    <div v-if="$slots?.top()">
       <slot name="top"></slot>
     </div>
     <!---/Left chat list -->
-    <div class="d-flex mainbox">
+    <div class="d-flex">
         <div class="left-part" v-if="lgAndUp && $.slots.leftpart">
             <!-- <perfect-scrollbar style="height: calc(100vh - 290px)"> -->
             <slot name="leftpart"></slot>

@@ -8,6 +8,6 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 
 public interface ChatMessageRepository extends MongoRepository<ChatMessage, String> {
-    @Query("{roomId : ?0}")
-    List<ChatMessage> findAllByRoomId(ObjectId roomId);
+  @Query("{'roomId' : ?0}")
+  List<ChatMessage> findAllByRoomId(String roomId);
 }

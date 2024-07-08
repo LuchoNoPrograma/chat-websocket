@@ -6,6 +6,7 @@ import luis.fluoxetina.chatwebsocket.dto.ChatMessageDto;
 import luis.fluoxetina.chatwebsocket.mapper.ChatMessageMapper;
 import luis.fluoxetina.chatwebsocket.model.doc.ChatMessage;
 import luis.fluoxetina.chatwebsocket.model.service.ChatMessageService;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -24,14 +25,14 @@ public class ChatController {
   private final ChatMessageService chatMessageService;
   private final SimpMessagingTemplate messagingTemplate;
 
-  @MessageMapping("/chat.send-message")
+  @MessageMapping("/chat.send-message-room")
   public void sendMessage(@Payload ChatMessageDto chatMessageDto) {
     ChatMessage chatMessagePersisted = chatMessageService.save(chatMessageMapper.toDocument(chatMessageDto));
 
     log.info("Message sent: {}", chatMessagePersisted);
     chatMessageMapper.toDto(chatMessagePersisted);
 
-    messagingTemplate.convertAndSend("/topic/chat/" + chatMessageDto.getRoomId(), chatMessageMapper.toDto(chatMessagePersisted));
+    messagingTemplate.convertAndSend("/topic/chat/room/" + chatMessageDto.getRoomId(), chatMessageMapper.toDto(chatMessagePersisted));
   }
 
 
