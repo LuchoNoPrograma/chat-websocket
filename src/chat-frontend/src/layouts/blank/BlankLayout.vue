@@ -13,7 +13,7 @@ const customizerStore = useCustomizerStore();
                 customizerStore.setBorderCard ? 'cardBordered' : '',
                 customizerStore.inputBg ? 'inputWithbg' : ''
            ]" :theme="customizerStore.actTheme"
-           class="pa-4"
+           class="pa-0"
     >
       <v-main>
         <v-container class="page-wrapper py-0" fluid>

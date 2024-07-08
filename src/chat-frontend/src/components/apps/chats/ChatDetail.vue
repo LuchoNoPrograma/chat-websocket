@@ -85,6 +85,8 @@ onMounted(async () => {
       }
     });
   });
+
+  scrollToBottom();
   updateTimes();
   window.addEventListener('focus', updateTimes);
 
@@ -97,14 +99,15 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <div class="customHeight">
-    <v-card class="mx-4">
-      <template v-slot:title>
-        <h3 class="font-weight-medium">
-          {{ chatStore.selectedRoom?.name }}
-          Eres: {{ chatStore.userConnected }}
-        </h3>
-      </template>
-    </v-card>
+    <v-sheet class="mx-4 py-2 px-4 rounded elevation-10 d-flex align-center gap-3">
+      <div class="d-inline">
+        <img class="overflow-hidden" style="border-radius: 100%; object-fit: cover" width="48px" height="48px" :src="chatStore?.selectedRoom?.imgPortrait" alt="1">
+      </div>
+      <h3 class="font-weight-medium d-inline">
+        {{ chatStore.selectedRoom?.name }}
+        Eres: {{ chatStore.userConnected }}
+      </h3>
+    </v-sheet>
     <v-divider/>
     <!---Chat History-->
     <v-container>
@@ -120,7 +123,7 @@ onBeforeUnmount(() => {
       <perfect-scrollbar class="rightpartHeight" ref="scrollbarApi">
         <div class="d-flex flex-column">
           <div v-for="chatMessage in chatStore.selectedRoom?.chatMessages" :key="chatMessage.id" class="px-4 pt-4"
-               style="border: 1px solid black">
+               >
             <div v-if="chatMessage.userId === chatStore.userConnected.username"
                  class="justify-end d-flex text-end mb-1">
               <div class="d-flex flex-column align-end">

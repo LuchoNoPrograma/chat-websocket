@@ -27,7 +27,7 @@ export const useChatStore = defineStore('chat', () => {
 
   const userOnlineList = ref<UserType[]>([]);
 
-  const chatMessageContent = ref<string>();
+  const chatMessageContent = ref<string>('');
   const selectedRoom = ref<RoomType>();
 
   const connect = (username: string) => {
