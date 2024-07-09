@@ -4,7 +4,7 @@ import type {ChatMessageType, ChatType} from '@/types/apps/ChatMessageType';
 import {MessageFormat, MessageType} from '@/types/apps/ChatMessageType';
 //@ts-ignore
 import SockJS from 'sockjs-client/dist/sockjs.js';
-import type {Client, Message} from 'webstomp-client';
+import type {Client, Message, Subscription} from 'webstomp-client';
 import Stomp, {Frame} from 'webstomp-client';
 import type {UserType} from "@/types/model/UserTypes";
 import axiosServices from "@/utils/axios";
@@ -18,6 +18,7 @@ export const useChatStore = defineStore('chat', () => {
   const userConnected = ref<UserType>();
   const socket = ref();
   const stompClient = ref<Client>();
+  const roomSubscriptions: {[key: string]: { subscription: Subscription , activeUsers: UserType[]}} = {};
 
   const roomList = ref<RoomType[]>([]);
 
@@ -102,12 +103,23 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   const subscribeRoom = (room: RoomType, onChatUpdate: (body: ChatMessageType) => void) => {
+    if(roomSubscriptions[room.id]) {
+      return;
+    }
+
     selectedRoom.value = room;
-    stompClient.value?.subscribe(`/topic/chat/room/${room.id}`, (message: Message) => {
+    const subscription = stompClient.value?.subscribe(`/topic/chat/room/${room.id}`, (message: Message) => {
       const payload: ChatMessageType = JSON.parse(message.body);
       selectedRoom.value?.chatMessages?.push(payload)
       onChatUpdate(payload);
     });
+
+    if(subscription){
+      roomSubscriptions[room.id] = {
+        subscription,
+        activeUsers: [...roomSubscriptions[room.id].activeUsers]
+      };
+    }
   }
 
   const sendMessage = () => {

@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 // common components
 import AppBaseCard from '@/components/shared/AppBaseCard.vue';
-import ChatListing from '@/components/apps/chats/ChatListing.vue';
-import ChatProfile from '@/components/apps/chats/ChatProfile.vue';
 import {useChatStore} from "@/stores/apps/chatStore";
 import {useRouter} from "vue-router";
 import ChatHeader from "@/components/apps/chats/ChatHeader.vue";
 import {ref} from "vue";
+
+import maleProfile from "@/assets/images/chat/default-male-profile.png";
+import type {RoomType} from "@/types/model/RoomTypes";
 
 const chatStore = useChatStore();
 const router = useRouter();
@@ -18,53 +19,86 @@ const logout = async () => {
   chatStore.disconnect();
   await router.push('/auth/register')
 }
+
+const enterRoom = async (room: RoomType) => {
+  await router.push({path: `/room/${room.id}`, replace: true})//ChatDetail.vue
+}
 </script>
 
 <template>
   <app-base-card>
+
     <template v-slot:app-bar>
       <chat-header></chat-header>
     </template>
     <template v-slot:navigation-drawer>
-      <v-tabs v-model="window" color="primary" class="border-b-md border-borderDarkColor">
+      <v-tabs v-model="window" color="primary">
         <v-tab value="0">Privados</v-tab>
         <v-tab value="1">Salas</v-tab>
       </v-tabs>
+      <v-divider class="border border-sm"></v-divider>
       <v-window v-model="window">
         <v-window-item>
-          <v-container>
-            <h4 class="font-weight-medium">
-              Usuarios en linea ({{ chatStore.getUserOnlineList().length }})
-            </h4>
+          <h4 class="font-weight-medium ml-4 mt-2">
+            Usuarios en linea ({{ chatStore.getUserOnlineList().length }})
+          </h4>
 
-            <div>
-              <v-list style="background-color: transparent !important;">
-                <perfect-scrollbar class="h-100">
-                  <v-list-item v-for="(user, index) in chatStore.getUserOnlineList()" :key="index"
-                               class="text-white">
-                    <div class="py-2 pl-4 w-100 d-flex align-center justify-space-between border border-md">
-                      <v-list-item-title>
-                        <span class="textPrimary">{{user.username}}</span>
-                      </v-list-item-title>
+          <v-list>
+            <perfect-scrollbar class="h-100">
+              <v-list-item v-for="(user, index) in chatStore.getUserOnlineList()" :key="index" class="mx-0 pa-0">
+                <div :class="{'border-b-0': index < chatStore.getUserOnlineList().length - 1}"
+                     class="py-2 pl-4 w-100 d-flex align-center justify-space-between border border-sm border-s-0 border-e-0">
+                  <div class="d-flex align-center gap-2">
+                    <img :src="maleProfile" alt="male-profile" class="obj-cover rounded-circle" height="48px"
+                         width="48px">
+                    <v-list-item-title>
+                      <span class="textPrimary text-h6">{{ user.username }}</span>
+                    </v-list-item-title>
+                  </div>
 
-                      <v-list-item :ripple="false">
-                        <v-btn icon size="30" varant="outlined" color="primary" elevation="10">
-                          <v-icon icon="mdi-email-fast"></v-icon>
-                        </v-btn>
-                      </v-list-item>
-                    </div>
+                  <v-list-item :ripple="false">
+                    <v-btn color="primary" elevation="10" icon size="30" varant="outlined">
+                      <v-icon icon="mdi-email-fast"></v-icon>
+                    </v-btn>
                   </v-list-item>
-                </perfect-scrollbar>
-              </v-list>
-            </div>
-          </v-container>
+                </div>
+              </v-list-item>
+            </perfect-scrollbar>
+          </v-list>
+        </v-window-item>
+        <v-window-item>
+          <h4 class="font-weight-medium ml-4 mt-2">
+            Salas disponibles ({{ chatStore.getRoomList().length }})
+          </h4>
+          <v-list>
+            <perfect-scrollbar>
+              <v-list-item v-for="(room, index) in chatStore.getRoomList()" :key="index" class="mx-0 pa-0">
+                <div class="py-2 pl-4 w-100 d-flex align-center justify-space-between border border-sm border-s-0 border-e-0"
+                     :class="{'border-b-0': index < chatStore.getRoomList().length - 1}"
+                >
+                  <v-list-item-title>
+                    <span class="textPrimary">{{ room.name }}</span>
+                  </v-list-item-title>
+
+                  <v-list-item :ripple="false">
+                    <v-btn color="primary" elevation="10" icon size="30" varant="outlined" @click="enterRoom(room)">
+                      <v-icon icon="mdi-login"></v-icon>
+                    </v-btn>
+                  </v-list-item>
+                </div>
+              </v-list-item>
+            </perfect-scrollbar>
+          </v-list>
         </v-window-item>
       </v-window>
     </template>
 
     <template v-slot:main-content>
-      <router-view>
-      </router-view>
+      <v-container>
+        <router-view v-slot="{Component, route}">
+          <component :is="Component" :key="route.path"></component>
+        </router-view>
+      </v-container>
     </template>
   </app-base-card>
 </template>

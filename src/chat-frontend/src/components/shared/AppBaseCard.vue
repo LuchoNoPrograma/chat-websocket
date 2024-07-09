@@ -33,15 +33,15 @@ const settingsStore = useSettingsStore();
     </div>
 
     <!---right chat conversation -->
-    <div class="right-part">
-      <!---Toggle Button For mobile-->
+<!--    <div class="right-part">
+      &lt;!&ndash;-Toggle Button For mobile&ndash;&gt;
       <v-btn block class="d-lg-none d-md-flex d-sm-flex" variant="text" @click="settingsStore.toggleNavigationDrawerMobile()">
         <Menu2Icon class="mr-2" size="20"/>
         Menu
       </v-btn>
       <v-divider class="d-lg-none d-block"/>
       <slot name="rightpart"></slot>
-    </div>
+    </div>-->
 
     <!---right chat conversation -->
   </div>

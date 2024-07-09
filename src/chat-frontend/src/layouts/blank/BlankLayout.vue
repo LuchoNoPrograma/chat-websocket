@@ -16,7 +16,7 @@ const customizerStore = useCustomizerStore();
            class="pa-0"
     >
       <v-main>
-        <v-container class="page-wrapper" fluid>
+        <v-container class="page-wrapper pa-0" fluid>
           <div class="maxWidth">
             <router-view></router-view>
           </div>

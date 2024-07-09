@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {nextTick, onBeforeUnmount, onMounted, ref} from 'vue';
+import {nextTick, onBeforeUnmount, onMounted, ref, watchEffect} from 'vue';
 import {useChatStore} from '@/stores/apps/chatStore';
 import {formatDistanceToNowStrict} from 'date-fns';
 import ChatSendMsg from './ChatSendMessage.vue';
@@ -72,6 +72,10 @@ const handleArrowClickToBottom = () => {
   /*newMessageFromOthers.value = false;*/
 }
 
+watchEffect(async() => {
+  chatStore.selectedRoom = await roomStore.getRoomById(router.currentRoute.value.params.roomId as string);
+})
+
 onMounted(async () => {
   chatStore.selectedRoom = await roomStore.getRoomById(router.currentRoute.value.params.roomId as string)
   chatStore.subscribeRoom(chatStore.selectedRoom, (chatMessage: ChatMessageType) => {
@@ -110,15 +114,6 @@ onBeforeUnmount(() => {
     <v-divider/>
     <!---Chat History-->
     <v-container>
-      <div class="container__new-message d-flex ga-1 align-center">
-<!--        <span class="bg-info elevation-10 py-1 px-2 text-subtitle-2" style="border-radius: 100%">{{newMessageCount}}</span>-->
-        <v-btn @click="handleArrowClickToBottom" class="elevation-10"
-               color="info" size="x-small" icon variant="flat">
-          <v-badge :content="newMessageCount" color="error" :offset-y="-10" :offset-x="-5">
-            <v-icon size="18" icon="mdi-chevron-double-down"></v-icon>
-          </v-badge>
-        </v-btn>
-      </div>
       <perfect-scrollbar class="rightpartHeight" :options="{minScrollbarLength: 20}" ref="scrollbarApi">
         <div class="d-flex flex-column">
           <div v-for="chatMessage in chatStore.selectedRoom?.chatMessages" :key="chatMessage.id" class="px-4 pt-4"
@@ -180,9 +175,15 @@ onBeforeUnmount(() => {
     </v-container>
     <v-divider/>
     <!---Chat send-->
-    <v-container>
-      <chat-send-msg></chat-send-msg>
-    </v-container>
+    <div class="container__new-message d-flex ga-1 align-center">
+      <v-btn @click="handleArrowClickToBottom" class="elevation-10"
+             color="info" size="x-small" icon variant="flat">
+        <v-badge :content="newMessageCount" color="error" :offset-y="-10" :offset-x="-5">
+          <v-icon size="18" icon="mdi-chevron-double-down"></v-icon>
+        </v-badge>
+      </v-btn>
+    </div>
+    <chat-send-msg></chat-send-msg>
   </div>
 </template>
 <style lang="scss">
@@ -192,8 +193,8 @@ onBeforeUnmount(() => {
 
 .container__new-message {
   position: absolute;
-  bottom: 80px;
-  right: 20px;
+  bottom: 20%;
+  right: 11.5%;
 }
 
 .rightpartHeight {
