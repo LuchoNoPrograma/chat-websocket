@@ -23,6 +23,7 @@ const BLUE_THEME: ThemeTypes = {
         textPrimary: '#2A3547',
         textSecondary: '#2A3547',
         borderColor: '#e5eaef',
+        borderDarkColor: '#2A3547',
         inputBorder: '#235198',
         containerBg: '#ffffff',
         background: '#eef5f9',

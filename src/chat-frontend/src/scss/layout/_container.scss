@@ -15,12 +15,12 @@ html {
 }
 
 .page-wrapper {
-    min-height: calc(100vh - 100px);
-    padding: 24px;
+    /*min-height: calc(100vh - 100px);*/
+    /*padding: 24px;*/
     // border-radius: $border-radius-root;
-    @media screen and (max-width: 767px) {
+    /*@media screen and (max-width: 767px) {
         padding: 20px 10px;
-    }
+    }*/
 }
 
 .maxWidth {

@@ -6,9 +6,12 @@ import ChatProfile from '@/components/apps/chats/ChatProfile.vue';
 import {useChatStore} from "@/stores/apps/chatStore";
 import {useRouter} from "vue-router";
 import ChatHeader from "@/components/apps/chats/ChatHeader.vue";
+import {ref} from "vue";
 
 const chatStore = useChatStore();
 const router = useRouter();
+
+const window = ref<number>(0);
 
 
 const logout = async () => {
@@ -19,41 +22,47 @@ const logout = async () => {
 
 <template>
   <app-base-card>
-    <template v-slot:top>
+    <template v-slot:app-bar>
       <chat-header></chat-header>
     </template>
-    <template v-slot:leftpart>
-      <v-card class="d-flex flex-column justify-space-between" style="height: 80vh">
-        <v-container>
-          <h4 class="font-weight-medium">
-            Usuarios en linea ({{ chatStore.getUserOnlineList().length }})
-          </h4>
+    <template v-slot:navigation-drawer>
+      <v-tabs v-model="window" color="primary" class="border-b-md border-borderDarkColor">
+        <v-tab value="0">Privados</v-tab>
+        <v-tab value="1">Salas</v-tab>
+      </v-tabs>
+      <v-window v-model="window">
+        <v-window-item>
+          <v-container>
+            <h4 class="font-weight-medium">
+              Usuarios en linea ({{ chatStore.getUserOnlineList().length }})
+            </h4>
 
-          <div>
-            <v-list style="background-color: transparent !important;">
-              <perfect-scrollbar class="h-100">
-                <v-list-item v-for="(user, index) in chatStore.getUserOnlineList()" :key="index"
-                             class="text-white">
-                  <div class="py-2 pl-4 w-100 d-flex align-center justify-space-between border border-md">
-                    <v-list-item-title>
-                      <span class="textPrimary">{{user.username}}</span>
-                    </v-list-item-title>
+            <div>
+              <v-list style="background-color: transparent !important;">
+                <perfect-scrollbar class="h-100">
+                  <v-list-item v-for="(user, index) in chatStore.getUserOnlineList()" :key="index"
+                               class="text-white">
+                    <div class="py-2 pl-4 w-100 d-flex align-center justify-space-between border border-md">
+                      <v-list-item-title>
+                        <span class="textPrimary">{{user.username}}</span>
+                      </v-list-item-title>
 
-                    <v-list-item :ripple="false">
-                      <v-btn icon size="30" varant="outlined" color="primary" elevation="10">
-                        <v-icon icon="mdi-email-fast"></v-icon>
-                      </v-btn>
-                    </v-list-item>
-                  </div>
-                </v-list-item>
-              </perfect-scrollbar>
-            </v-list>
-          </div>
-        </v-container>
-      </v-card>
+                      <v-list-item :ripple="false">
+                        <v-btn icon size="30" varant="outlined" color="primary" elevation="10">
+                          <v-icon icon="mdi-email-fast"></v-icon>
+                        </v-btn>
+                      </v-list-item>
+                    </div>
+                  </v-list-item>
+                </perfect-scrollbar>
+              </v-list>
+            </div>
+          </v-container>
+        </v-window-item>
+      </v-window>
     </template>
 
-    <template v-slot:rightpart>
+    <template v-slot:main-content>
       <router-view>
       </router-view>
     </template>
