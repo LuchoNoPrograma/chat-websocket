@@ -39,9 +39,9 @@ const logout = async () => {
                       <span class="textPrimary">{{user.username}}</span>
                     </v-list-item-title>
 
-                    <v-list-item>
-                      <v-btn icon size="30" varant="outlined">
-                        <v-icon icon="mdi-email-fast" size="20"></v-icon>
+                    <v-list-item :ripple="false">
+                      <v-btn icon size="30" varant="outlined" color="primary" elevation="10">
+                        <v-icon icon="mdi-email-fast"></v-icon>
                       </v-btn>
                     </v-list-item>
                   </div>

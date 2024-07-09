@@ -86,7 +86,6 @@ onMounted(async () => {
     });
   });
 
-  scrollToBottom();
   updateTimes();
   window.addEventListener('focus', updateTimes);
 
@@ -116,11 +115,11 @@ onBeforeUnmount(() => {
         <v-btn @click="handleArrowClickToBottom" class="elevation-10"
                color="info" size="x-small" icon variant="flat">
           <v-badge :content="newMessageCount" color="error" :offset-y="-10" :offset-x="-5">
-            <v-icon>mdi-arrow-down</v-icon>
+            <v-icon size="18" icon="mdi-chevron-double-down"></v-icon>
           </v-badge>
         </v-btn>
       </div>
-      <perfect-scrollbar class="rightpartHeight" ref="scrollbarApi">
+      <perfect-scrollbar class="rightpartHeight" :options="{minScrollbarLength: 20}" ref="scrollbarApi">
         <div class="d-flex flex-column">
           <div v-for="chatMessage in chatStore.selectedRoom?.chatMessages" :key="chatMessage.id" class="px-4 pt-4"
                >
