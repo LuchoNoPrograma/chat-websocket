@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {useChatStore} from "@/stores/apps/chatStore";
+import {useChatStore} from "@/stores/chatStore";
 import {computed, onMounted, ref} from "vue";
 import type {RoomType} from "@/types/model/RoomTypes";
 import {helpers, required} from "@vuelidate/validators";
@@ -12,9 +12,11 @@ import useVuelidate from "@vuelidate/core";
 import {useRouter} from "vue-router";
 import type {Message} from "webstomp-client";
 import type {ChatMessageType} from "@/types/apps/ChatMessageType";
+import {useRoomStore} from "@/stores/roomStore";
 
 
 const chatStore = useChatStore();
+const roomStore = useRoomStore();
 const router = useRouter();
 
 const roomForm = ref<RoomType>({} as RoomType);
@@ -92,14 +94,12 @@ onMounted(async () => {
 })
 
 const createRoom = () => {
-  chatStore.sendRoom(roomForm.value);
+  roomStore.createRoom(roomForm.value);
 }
-
 
 const enterRoom = async (room: RoomType) => {
   await router.push(`/room/${room.id}`)//ChatDetail.vue
 }
-
 </script>
 
 <template>

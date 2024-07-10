@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {useChatStore} from '@/stores/apps/chatStore';
+import {useChatStore} from '@/stores/chatStore';
 import {nextTick, ref} from "vue";
 
 const chatStore = useChatStore();

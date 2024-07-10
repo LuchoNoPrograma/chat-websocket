@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {nextTick, onBeforeUnmount, onMounted, ref, watchEffect} from 'vue';
-import {useChatStore} from '@/stores/apps/chatStore';
+import {useChatStore} from '@/stores/chatStore';
 import {formatDistanceToNowStrict} from 'date-fns';
 import ChatSendMsg from './ChatSendMessage.vue';
 import {useDisplay} from 'vuetify';

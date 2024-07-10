@@ -20,6 +20,7 @@ public class Room {
 
   private String name;
   private String description;
+  private Integer activeUsers;
 
   @ToString.Exclude
   private String imgPortrait;

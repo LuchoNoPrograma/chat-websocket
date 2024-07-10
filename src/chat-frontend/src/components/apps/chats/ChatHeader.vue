@@ -2,7 +2,7 @@
 
 import {Menu2Icon} from "vue-tabler-icons";
 import NotificationDD from "@/layouts/full/vertical-header/NotificationDD.vue";
-import {useChatStore} from "@/stores/apps/chatStore";
+import {useChatStore} from "@/stores/chatStore";
 import {useRouter} from "vue-router";
 import {useCustomizerStore} from "@/stores/customizer";
 import {ref} from "vue";

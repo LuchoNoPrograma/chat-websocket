@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useChatStore } from '@/stores/apps/chatStore';
+import { useChatStore } from '@/stores/chatStore';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { last } from 'lodash';
 

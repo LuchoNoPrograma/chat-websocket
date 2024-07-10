@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import luis.fluoxetina.chatwebsocket.dto.ChatMessageDto;
 import luis.fluoxetina.chatwebsocket.mapper.ChatMessageMapper;
 import luis.fluoxetina.chatwebsocket.model.doc.ChatMessage;
+import luis.fluoxetina.chatwebsocket.model.doc.User;
 import luis.fluoxetina.chatwebsocket.model.service.ChatMessageService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -35,11 +36,18 @@ public class ChatController {
     messagingTemplate.convertAndSend("/topic/chat/room/" + chatMessageDto.getRoomId(), chatMessageMapper.toDto(chatMessagePersisted));
   }
 
+  @MessageMapping("/chat.join-room")
+  public void joinChatRoom(@Payload ChatMessageDto chatMessageDto){
+    log.info("Joining room: {}", chatMessageDto.getUserId());
+
+
+    messagingTemplate.convertAndSend("/topic/chat/room/" + chatMessageDto.getRoomId(), chatMessageDto);
+  }
+
 
   @MessageMapping("/chat.add-user")
   @SendTo("/topic/chat")
   public ChatMessageDto addUser(@Payload ChatMessageDto chatMessageDto, SimpMessageHeaderAccessor headerAccessor) {
-
     log.info("Adding user: {}", chatMessageDto.getUserId());
     headerAccessor.getSessionAttributes().put("username", chatMessageDto.getUserId());
     return chatMessageDto;

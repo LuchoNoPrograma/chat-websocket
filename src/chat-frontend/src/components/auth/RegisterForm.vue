@@ -1,9 +1,13 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
-import { useChatStore } from "@/stores/apps/chatStore";
+import { useChatStore } from "@/stores/chatStore";
 import { useRouter } from "vue-router";
+import {useWebSocketStore} from "@/stores/webSocketStore";
+import {useUserStore} from "@/stores/userStore";
 
 const chatStore = useChatStore();
+const userStore= useUserStore();
+const webSocketStore = useWebSocketStore();
 const router = useRouter();
 const valid = ref(false);
 const username = ref('');
@@ -14,9 +18,12 @@ const usernameRules = ref([
 ]);
 
 const sendData = async () => {
-  console.log("Validando")
   if(!valid.value) return;
-  chatStore.connect(username.value)
+
+  webSocketStore.connect(username.value)
+  await userStore.subscribeTopicUser();
+  await chatStore.subscribeTopicRoom();
+
   await router.push("/chat");
 }
 

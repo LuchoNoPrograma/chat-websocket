@@ -9,6 +9,7 @@ export type RoomType = {
   pathPortrait: string | null | ArrayBuffer,
   createdAt: Date | string,
   users?: UserType[],
+  activeUsers?: number,
   chatMessages?: ChatMessageType[],
   tags?: TagType[],
 

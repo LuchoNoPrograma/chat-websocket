@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // common components
 import AppBaseCard from '@/components/shared/AppBaseCard.vue';
-import {useChatStore} from "@/stores/apps/chatStore";
+import {useChatStore} from "@/stores/chatStore";
 import {useRouter} from "vue-router";
 import ChatHeader from "@/components/apps/chats/ChatHeader.vue";
 import {ref} from "vue";
@@ -78,6 +78,9 @@ const enterRoom = async (room: RoomType) => {
                 >
                   <v-list-item-title>
                     <span class="textPrimary">{{ room.name }}</span>
+                    <span class="font-weight-bold text-13 text-secondary">
+                      {{chatStore.getRoomSubscriptions(room.id)?.activeUsers?.length ?? 0}} Online
+                    </span>
                   </v-list-item-title>
 
                   <v-list-item :ripple="false">
