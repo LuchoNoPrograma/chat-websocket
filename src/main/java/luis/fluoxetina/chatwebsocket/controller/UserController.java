@@ -9,6 +9,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,20 +25,21 @@ public class UserController {
   private final UserService userService;
   private final UserMapper userMapper;
 
-
   @MessageMapping("/user.connect/{username}")
   @SendTo("/topic/user")
   public UserDto connect(@DestinationVariable String username, StompHeaderAccessor headerAccessor) {
-    log.info("User Connected: " + username);
+    log.info("User Connected: {}", username);
+    headerAccessor.getSessionAttributes().put("username", username);
+
     return userMapper.toDto(userService.connect(username));
   }
 
-  @MessageMapping("/user.disconnect/{username}")
+  /*@MessageMapping("/user.disconnect/{username}")
   @SendTo("/topic/user")
   public UserDto disconnect(@DestinationVariable String username, StompHeaderAccessor headerAccessor) {
-    log.info("User Disconnected: " + username);
+    log.info("User Disconnected: {}", username);
     return userMapper.toDto(userService.disconnect(username));
-  }
+  }*/
 
   @GetMapping("/api/v1/user-online")
   public List<UserDto> findAllOnline(@RequestParam(defaultValue = "true") boolean online) {

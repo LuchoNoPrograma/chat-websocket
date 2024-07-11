@@ -6,12 +6,14 @@ import Stomp, {Frame} from "webstomp-client";
 import SockJS from 'sockjs-client/dist/sockjs.js';
 import {useUserStore} from "@/stores/userStore";
 import {useRoomStore} from "@/stores/roomStore";
+import {useChatStore} from "@/stores/chatStore";
 
 export const useWebSocketStore = defineStore('web-socket', () => {
   const socket = ref<any>();
   const stompClient = ref<Client>();
   const userStore = useUserStore();
   const roomStore = useRoomStore();
+  const chatStore = useChatStore();
 
   const connect = (username: string) => {
     const URL = import.meta.env.VITE_BACKEND_URL + '/ws-chatapp';
@@ -38,7 +40,8 @@ export const useWebSocketStore = defineStore('web-socket', () => {
 
   const disconnect = () => {
     if (stompClient.value) {
-      stompClient.value?.send(`/ws/user.disconnect/${userStore.userConnected?.username}`)
+      window.removeEventListener('beforeunload', disconnect);
+      chatStore.subscribedChatRooms = {};
       stompClient.value?.disconnect();
     }
   };

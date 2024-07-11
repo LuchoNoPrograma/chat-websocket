@@ -39,14 +39,15 @@ public class ChatController {
     ChatMessage chatMessagePersisted = chatMessageService.save(chatMessageMapper.toDocument(chatMessageDto));
 
     if(chatMessageDto.getType().equals(MessageType.JOIN)){
-      log.info("User joined: {}", chatMessageDto.getUserId());
       Room room = roomService.joinRoom(chatMessageDto.getRoomId(), chatMessageDto.getUserId());
+      messagingTemplate.convertAndSend("/topic/room", roomMapper.toDto(room));
+    }else if(chatMessageDto.getType().equals(MessageType.LEAVE)){
+      Room room = roomService.leaveRoom(chatMessageDto.getRoomId(), chatMessageDto.getUserId());
       messagingTemplate.convertAndSend("/topic/room", roomMapper.toDto(room));
     }
 
-    log.info("Message sent: {}", chatMessagePersisted);
+    log.info("Message chat: {}", chatMessagePersisted);
     chatMessageMapper.toDto(chatMessagePersisted);
-
     messagingTemplate.convertAndSend("/topic/chat/room/" + chatMessageDto.getRoomId(), chatMessageMapper.toDto(chatMessagePersisted));
   }
 

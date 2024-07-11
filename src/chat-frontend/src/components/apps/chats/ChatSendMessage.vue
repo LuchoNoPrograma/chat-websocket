@@ -26,7 +26,7 @@ const sendMessageAndClear = () => {
     body: chatStore.chatMessageContent,
     type: MessageType.CHAT,
     format: MessageFormat.TEXT,
-    roomId: roomStore.roomSelected?.id,
+    roomId: roomStore.selectedRoom?.id,
     userId: userStore.userConnected?.username
   });
 
