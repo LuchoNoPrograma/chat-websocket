@@ -50,4 +50,14 @@ public class RoomService {
             .withOptions(FindAndModifyOptions.options().returnNew(true))
             .findAndModifyValue();
   }
+
+  public Room leaveRoom(String roomId, String username){
+    Query query = new Query(Criteria.where("_id").is(new ObjectId(roomId)));
+    Update update = new Update().inc("activeUsers", -1);
+    return mongoTemplate.update(Room.class)
+            .matching(query)
+            .apply(update)
+            .withOptions(FindAndModifyOptions.options().returnNew(true))
+            .findAndModifyValue();
+  }
 }

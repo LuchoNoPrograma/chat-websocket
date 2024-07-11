@@ -22,8 +22,9 @@ export const useChatStore = defineStore('chat', () => {
     chatHistory: []
   });
 
+  //Join chat room
   const subscribeChatRoom = (room: RoomType, onChatUpdate: (body: ChatMessageType) => void) => {
-    if(subscribedChatRooms.value[room.id]){
+    if (subscribedChatRooms.value[room.id]) {
       return
     }
 
@@ -44,6 +45,24 @@ export const useChatStore = defineStore('chat', () => {
     if (subscription) {
       subscribedChatRooms.value[room.id] = subscription
     }
+  }
+
+  //Leave chat room
+  const unsubscribeChatRoom = (room: RoomType) => {
+    webSocketStore.stompClient?.send('/ws/chat.send-message-room', JSON.stringify({
+      type: MessageType.LEAVE,
+      format: MessageFormat.TEXT,
+      roomId: roomStore.selectedRoom?.id,
+      userId: userStore.userConnected?.username
+    }))
+
+    //custom header to handle unsubscribe event in Spring Boot
+    webSocketStore?.stompClient?.unsubscribe(subscribedChatRooms.value[room.id].id, {
+      destination: '/topic/chat/room/' + room.id
+    });
+
+    roomStore.selectedRoom = null;
+    delete subscribedChatRooms.value[room.id];
   }
 
   const sendMessage = (chatMessage: ChatMessageType) => {
@@ -68,7 +87,7 @@ export const useChatStore = defineStore('chat', () => {
 
 
   return {
-    chatMessageContent, subscribeChatRoom,
+    chatMessageContent, subscribeChatRoom, unsubscribeChatRoom, subscribedChatRooms,
     sendMessage, getChatUser,
   };
 });

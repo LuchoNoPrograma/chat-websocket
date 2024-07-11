@@ -79,6 +79,11 @@ watchEffect(async () => {
   roomStore.selectedRoom = await roomStore.getRoomById(router.currentRoute.value.params.roomId as string);
 })
 
+const leaveRoom = () => {
+  chatStore.unsubscribeChatRoom(roomStore.selectedRoom);
+  router.replace('/chat');
+}
+
 onMounted(async () => {
   roomStore.selectedRoom = await roomStore.getRoomById(router.currentRoute.value.params.roomId as string);
   chatStore.subscribeChatRoom(roomStore.selectedRoom, (chatMessage: ChatMessageType) => {
@@ -105,15 +110,28 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <div class="customHeight">
-    <v-sheet class="mx-4 py-2 px-4 rounded elevation-10 d-flex align-center gap-3">
-      <div class="d-inline">
-        <img class="overflow-hidden" style="border-radius: 100%; object-fit: cover" width="48px" height="48px"
+    <v-sheet class="mx-4 py-2 px-4 rounded elevation-10 d-flex align-center justify-space-between">
+      <div class="d-flex align-center gap-3">
+        <img class="d-inline overflow-hidden" style="border-radius: 100%; object-fit: cover" width="48px" height="48px"
              :src="roomStore.selectedRoom?.imgPortrait" alt="1">
+        <h3 class="font-weight-medium d-inline">
+          {{ roomStore.selectedRoom?.name }}
+          Eres: {{ userStore.userConnected?.username }}
+        </h3>
       </div>
-      <h3 class="font-weight-medium d-inline">
-        {{ roomStore.selectedRoom?.name }}
-        Eres: {{ userStore.userConnected?.username }}
-      </h3>
+      <v-menu location="bottom">
+        <template v-slot:activator="{ props }">
+          <v-btn icon variant="plain" v-bind="props">
+            <v-icon icon="mdi-dots-vertical"></v-icon>
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item class="pe-10" @click="leaveRoom">
+            Abandonar la sala
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-sheet>
     <v-divider/>
     <!---Chat History-->
@@ -125,13 +143,13 @@ onBeforeUnmount(() => {
             <div v-if="chatMessage.type === MessageType.JOIN" class="d-flex justify-center">
               <v-sheet class="w-fit-content px-4 py-1 text-center"
                        color="success" elevation="10" rounded="md">
-                {{ chatMessage.userId }} se ha unido!
+                <span class="font-weight-semibold">{{ chatMessage.userId }}</span> se ha unido
               </v-sheet>
             </div>
             <div v-else-if="chatMessage.type === MessageType.LEAVE" class="d-flex justify-center">
               <v-sheet class="w-fit-content px-4 py-1 text-center"
                        color="error" elevation="10" rounded="md">
-                {{ chatMessage.userId }} ha salido.
+                <span class="font-weight-semibold">{{ chatMessage.userId }}</span> salió
               </v-sheet>
             </div>
             <div
