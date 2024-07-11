@@ -4,10 +4,12 @@ import { useChatStore } from "@/stores/chatStore";
 import { useRouter } from "vue-router";
 import {useWebSocketStore} from "@/stores/webSocketStore";
 import {useUserStore} from "@/stores/userStore";
+import {useRoomStore} from "@/stores/roomStore";
 
-const chatStore = useChatStore();
-const userStore= useUserStore();
 const webSocketStore = useWebSocketStore();
+const userStore = useUserStore();
+const roomStore = useRoomStore();
+
 const router = useRouter();
 const valid = ref(false);
 const username = ref('');
@@ -19,10 +21,7 @@ const usernameRules = ref([
 
 const sendData = async () => {
   if(!valid.value) return;
-
   webSocketStore.connect(username.value)
-  await userStore.subscribeTopicUser();
-  await chatStore.subscribeTopicRoom();
 
   await router.push("/chat");
 }

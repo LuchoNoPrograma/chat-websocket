@@ -7,13 +7,16 @@ import {useDisplay} from 'vuetify';
 import {es} from 'date-fns/locale';
 
 import {type ChatMessageType, MessageFormat, MessageType} from '@/types/apps/ChatMessageType';
-import {useRoomStore} from "@/stores/model/RoomStore";
 import {useRouter} from "vue-router";
+import {useRoomStore} from "@/stores/roomStore";
+import {useUserStore} from "@/stores/userStore";
 
 const {lgAndUp} = useDisplay();
 
-const roomStore = useRoomStore();
 const chatStore = useChatStore();
+const roomStore = useRoomStore();
+const userStore = useUserStore();
+
 const router = useRouter();
 
 const Rpart = ref(lgAndUp ? true : false);
@@ -72,15 +75,15 @@ const handleArrowClickToBottom = () => {
   /*newMessageFromOthers.value = false;*/
 }
 
-watchEffect(async() => {
-  chatStore.selectedRoom = await roomStore.getRoomById(router.currentRoute.value.params.roomId as string);
+watchEffect(async () => {
+  roomStore.selectedRoom = await roomStore.getRoomById(router.currentRoute.value.params.roomId as string);
 })
 
 onMounted(async () => {
-  chatStore.selectedRoom = await roomStore.getRoomById(router.currentRoute.value.params.roomId as string)
-  chatStore.subscribeRoom(chatStore.selectedRoom, (chatMessage: ChatMessageType) => {
+  roomStore.selectedRoom = await roomStore.getRoomById(router.currentRoute.value.params.roomId as string);
+  chatStore.subscribeChatRoom(roomStore.selectedRoom, (chatMessage: ChatMessageType) => {
     nextTick(() => {
-      const isCurrentUser = chatMessage.userId === chatStore.userConnected.username;
+      const isCurrentUser = chatMessage.userId === userStore.userConnected?.username
       if (isCurrentUser) {
         scrollToBottom();
       } else {
@@ -104,11 +107,12 @@ onBeforeUnmount(() => {
   <div class="customHeight">
     <v-sheet class="mx-4 py-2 px-4 rounded elevation-10 d-flex align-center gap-3">
       <div class="d-inline">
-        <img class="overflow-hidden" style="border-radius: 100%; object-fit: cover" width="48px" height="48px" :src="chatStore?.selectedRoom?.imgPortrait" alt="1">
+        <img class="overflow-hidden" style="border-radius: 100%; object-fit: cover" width="48px" height="48px"
+             :src="roomStore.selectedRoom?.imgPortrait" alt="1">
       </div>
       <h3 class="font-weight-medium d-inline">
-        {{ chatStore.selectedRoom?.name }}
-        Eres: {{ chatStore.userConnected }}
+        {{ roomStore.selectedRoom?.name }}
+        Eres: {{ userStore.userConnected?.username }}
       </h3>
     </v-sheet>
     <v-divider/>
@@ -116,10 +120,23 @@ onBeforeUnmount(() => {
     <v-container>
       <perfect-scrollbar class="rightpartHeight" :options="{minScrollbarLength: 20}" ref="scrollbarApi">
         <div class="d-flex flex-column">
-          <div v-for="chatMessage in chatStore.selectedRoom?.chatMessages" :key="chatMessage.id" class="px-4 pt-4"
-               >
-            <div v-if="chatMessage.userId === chatStore.userConnected.username"
-                 class="justify-end d-flex text-end mb-1">
+          <div v-for="chatMessage in roomStore.selectedRoom?.chatMessages" :key="chatMessage.id" class="px-4 pt-4"
+          >
+            <div v-if="chatMessage.type === MessageType.JOIN" class="d-flex justify-center">
+              <v-sheet class="w-fit-content px-4 py-1 text-center"
+                       color="success" elevation="10" rounded="md">
+                {{ chatMessage.userId }} se ha unido!
+              </v-sheet>
+            </div>
+            <div v-else-if="chatMessage.type === MessageType.LEAVE" class="d-flex justify-center">
+              <v-sheet class="w-fit-content px-4 py-1 text-center"
+                       color="error" elevation="10" rounded="md">
+                {{ chatMessage.userId }} ha salido.
+              </v-sheet>
+            </div>
+            <div
+              v-else-if="chatMessage.type === MessageType.CHAT && chatMessage.userId === userStore.userConnected?.username"
+              class="justify-end d-flex text-end mb-1">
               <div class="d-flex flex-column align-end">
                 <v-sheet
                   color="info"
@@ -132,10 +149,6 @@ onBeforeUnmount(() => {
                 <small v-if="chatMessage" class="text-subtitle-2 ml-1">
                   {{ chatMessage.relativeTime ? `Hace ${chatMessage.relativeTime}` : 'Ahora' }}
                 </small>
-                <v-sheet v-if="chatMessage.type === MessageType.JOIN" class="mx-auto">
-                  {{ chatMessage.userId }} se ha unido!
-                </v-sheet>
-
                 <!--                <v-sheet
                                     v-if="chatMessage.messageFormat !== MessageFormat.IMG"
                                     class="bg-grey100 rounded-md px-3 py-2 mb-1"

@@ -1,8 +1,13 @@
 <script lang="ts" setup>
 import {useChatStore} from '@/stores/chatStore';
 import {nextTick, ref} from "vue";
+import {MessageFormat, MessageType} from "@/types/apps/ChatMessageType";
+import {useRoomStore} from "@/stores/roomStore";
+import {useUserStore} from "@/stores/userStore";
 
 const chatStore = useChatStore();
+const roomStore = useRoomStore();
+const userStore = useUserStore();
 
 const textareaRef = ref<any>();
 const resizeTextarea = () => {
@@ -16,7 +21,15 @@ const sendMessageAndClear = () => {
   if (chatStore.chatMessageContent?.length === 0) {
     return
   }
-  chatStore.sendMessage();
+
+  chatStore.sendMessage({
+    body: chatStore.chatMessageContent,
+    type: MessageType.CHAT,
+    format: MessageFormat.TEXT,
+    roomId: roomStore.roomSelected?.id,
+    userId: userStore.userConnected?.username
+  });
+
   chatStore.chatMessageContent = '';
 
   nextTick(() => {

@@ -8,8 +8,12 @@ import {ref} from "vue";
 
 import maleProfile from "@/assets/images/chat/default-male-profile.png";
 import type {RoomType} from "@/types/model/RoomTypes";
+import {useUserStore} from "@/stores/userStore";
+import {useRoomStore} from "@/stores/roomStore";
 
 const chatStore = useChatStore();
+const roomStore= useRoomStore();
+const userStore= useUserStore();
 const router = useRouter();
 
 const window = ref<number>(0);
@@ -27,7 +31,6 @@ const enterRoom = async (room: RoomType) => {
 
 <template>
   <app-base-card>
-
     <template v-slot:app-bar>
       <chat-header></chat-header>
     </template>
@@ -40,13 +43,13 @@ const enterRoom = async (room: RoomType) => {
       <v-window v-model="window">
         <v-window-item>
           <h4 class="font-weight-medium ml-4 mt-2">
-            Usuarios en linea ({{ chatStore.getUserOnlineList().length }})
+            Usuarios en linea ({{ userStore.userOnlineList.length }})
           </h4>
 
           <v-list>
             <perfect-scrollbar class="h-100">
-              <v-list-item v-for="(user, index) in chatStore.getUserOnlineList()" :key="index" class="mx-0 pa-0">
-                <div :class="{'border-b-0': index < chatStore.getUserOnlineList().length - 1}"
+              <v-list-item v-for="(user, index) in userStore.userOnlineList" :key="index" class="mx-0 pa-0">
+                <div :class="{'border-b-0': index < userStore.userOnlineList.length - 1}"
                      class="py-2 pl-4 w-100 d-flex align-center justify-space-between border border-sm border-s-0 border-e-0">
                   <div class="d-flex align-center gap-2">
                     <img :src="maleProfile" alt="male-profile" class="obj-cover rounded-circle" height="48px"
@@ -68,18 +71,18 @@ const enterRoom = async (room: RoomType) => {
         </v-window-item>
         <v-window-item>
           <h4 class="font-weight-medium ml-4 mt-2">
-            Salas disponibles ({{ chatStore.getRoomList().length }})
+            Salas disponibles ({{ roomStore.roomList.length }})
           </h4>
           <v-list>
             <perfect-scrollbar>
-              <v-list-item v-for="(room, index) in chatStore.getRoomList()" :key="index" class="mx-0 pa-0">
+              <v-list-item v-for="(room, index) in roomStore.roomList" :key="index" class="mx-0 pa-0">
                 <div class="py-2 pl-4 w-100 d-flex align-center justify-space-between border border-sm border-s-0 border-e-0"
-                     :class="{'border-b-0': index < chatStore.getRoomList().length - 1}"
+                     :class="{'border-b-0': index < roomStore.roomList.length - 1}"
                 >
                   <v-list-item-title>
-                    <span class="textPrimary">{{ room.name }}</span>
+                    <div class="textPrimary">{{ room.name }}</div>
                     <span class="font-weight-bold text-13 text-secondary">
-                      {{chatStore.getRoomSubscriptions(room.id)?.activeUsers?.length ?? 0}} Online
+                      {{room?.activeUsers}} Online
                     </span>
                   </v-list-item-title>
 

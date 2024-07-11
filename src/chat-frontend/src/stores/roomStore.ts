@@ -2,15 +2,14 @@ import {defineStore} from "pinia";
 import type {RoomType} from "@/types/model/RoomTypes";
 import {ref} from "vue";
 import {useWebSocketStore} from "@/stores/webSocketStore";
-import type {Message, Subscription} from "webstomp-client";
-import {useChatStore} from "@/stores/chatStore";
+import type {Message} from "webstomp-client";
 import axiosServices from "@/utils/axios";
 
 export const useRoomStore = defineStore('room', () => {
   const webSocketStore = useWebSocketStore();
 
   const roomList = ref<RoomType[]>([]);
-  const roomSelected = ref<RoomType>();
+  const selectedRoom = ref<RoomType>();
 
   const subscribeTopicRoom = async () => {
     const response = await axiosServices.get<RoomType[]>('/api/v1/room')
@@ -35,6 +34,11 @@ export const useRoomStore = defineStore('room', () => {
     webSocketStore.stompClient?.send('/ws/room.create-room', JSON.stringify(room));
   }
 
+  const getRoomById = async (id: string) => {
+    const response = await axiosServices.get<RoomType>(`/api/v1/room/${id}`);
+    return response.data;
+  }
 
-  return {roomList, roomSelected, createRoom, subscribeTopicRoom};
+
+  return {roomList, selectedRoom, createRoom, subscribeTopicRoom, getRoomById};
 });

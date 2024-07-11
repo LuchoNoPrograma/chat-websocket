@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
 import {ref} from 'vue';
 import type {ChatMessageType, ChatType} from '@/types/apps/ChatMessageType';
-import {MessageFormat, MessageType} from '@/types/apps/ChatMessageType';
+import {MessageFormat, MessageType} from "@/types/apps/ChatMessageType";
 import type {Message, Subscription} from 'webstomp-client';
 import type {UserType} from "@/types/model/UserTypes";
 import axiosServices from "@/utils/axios";
@@ -15,7 +15,7 @@ export const useChatStore = defineStore('chat', () => {
   const roomStore = useRoomStore();
   const userStore = useUserStore();
 
-  const subscribedChatRooms = ref<{[key: string]: Subscription}>({});
+  const subscribedChatRooms = ref<{ [key: string]: Subscription }>({});
 
   const chatMessageContent = ref<string>('');
   const chatUser = ref<ChatType>({
@@ -23,43 +23,33 @@ export const useChatStore = defineStore('chat', () => {
   });
 
   const subscribeChatRoom = (room: RoomType, onChatUpdate: (body: ChatMessageType) => void) => {
-    webSocketStore?.stompClient?.send(`/ws/room.join-room/${room.id}`, JSON.stringify(webSocketStore.userConnected));
-    roomStore.roomSelected = room;
+    if(subscribedChatRooms.value[room.id]){
+      return
+    }
 
     const subscription = webSocketStore.stompClient?.subscribe(`/topic/chat/room/${room.id}`, (message: Message) => {
       const payload: ChatMessageType = JSON.parse(message.body);
-      roomStore.roomSelected?.chatMessages?.push(payload)
+      console.log(payload);
+      roomStore.selectedRoom?.chatMessages?.push(payload)
       onChatUpdate(payload);
     });
 
-    if(subscription){
+    webSocketStore.stompClient?.send('/ws/chat.send-message-room', JSON.stringify({
+      type: MessageType.JOIN,
+      format: MessageFormat.TEXT,
+      roomId: roomStore.selectedRoom?.id,
+      userId: userStore.userConnected?.username
+    }));
+
+    if (subscription) {
       subscribedChatRooms.value[room.id] = subscription
     }
   }
 
-  const sendMessage = () => {
-    const chatMessage: ChatMessageType = {
-      body: chatMessageContent.value,
-      type: MessageType.CHAT,
-      format: MessageFormat.TEXT,
-      roomId: roomStore.roomSelected?.id,
-      userId: userStore.userConnected?.username
-    };
-
+  const sendMessage = (chatMessage: ChatMessageType) => {
     webSocketStore.stompClient?.send('/ws/chat.send-message-room', JSON.stringify(chatMessage));
     chatMessageContent.value = '';
   };
-
-  const joinRoom = () => {
-    const chatMessage: ChatMessageType = {
-      type: MessageType.JOIN,
-      format: MessageFormat.TEXT,
-      roomId: roomStore.roomSelected?.id,
-      userId: userStore.userConnected?.username
-    }
-
-    webSocketStore.stompClient?.send('/ws/chat.')
-  }
 
   const getChatUser = async () => {
     if (!chatUser.value.username)

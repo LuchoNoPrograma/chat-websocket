@@ -18,6 +18,7 @@ public class RoomDto {
   private String id;
   private String name;
   private String description;
+  private Integer activeUsers;
 
   //Handle img in base64
   private String imgPortrait;

@@ -42,7 +42,6 @@ export enum MessageFormat {
 
 export type ChatMessageType = {
     id?: string,
-    sender?: string;
     body?: string;
     type: MessageType;
     format: MessageFormat;

@@ -18,6 +18,9 @@ export const useUserStore = defineStore('user', () => {
     webSocketStore?.stompClient?.subscribe('/topic/user', (message: Message) => {
       const payload: UserType = JSON.parse(message.body);
 
+      if(!userConnected.value){
+        userConnected.value = payload;
+      }
       userOnlineList.value = userOnlineList.value.filter(user => user.username !== payload.username);
       if(payload.online){
         userOnlineList.value.unshift(payload);

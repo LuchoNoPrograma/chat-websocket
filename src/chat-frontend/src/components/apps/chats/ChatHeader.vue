@@ -8,9 +8,10 @@ import {useCustomizerStore} from "@/stores/customizer";
 import {ref} from "vue";
 import {useTheme} from "vuetify";
 import {useSettingsStore} from "@/stores/settingsStore";
+import {useWebSocketStore} from "@/stores/webSocketStore";
 
 const theme = useTheme();
-const chatStore = useChatStore();
+const webSocketStore = useWebSocketStore();
 const router = useRouter();
 
 const emits = defineEmits({
@@ -18,7 +19,7 @@ const emits = defineEmits({
 });
 
 const logout = async () => {
-  chatStore.disconnect();
+  webSocketStore.disconnect();
   await router.push('/auth/register')
 }
 

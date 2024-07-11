@@ -111,7 +111,7 @@ const enterRoom = async (room: RoomType) => {
 
     <v-container>
       <v-row>
-        <v-col v-for="room in chatStore.getRoomList()" :key="room.id" cols="12" lg="4" md="6" sm="6"
+        <v-col v-for="room in roomStore.roomList" :key="room.id" cols="12" lg="4" md="6" sm="6"
                class="chat-room__item">
           <v-card elevation="2">
             <template v-slot:default>

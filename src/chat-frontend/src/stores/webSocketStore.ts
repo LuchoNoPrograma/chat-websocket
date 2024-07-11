@@ -1,16 +1,17 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import type {Client, Message} from "webstomp-client";
+import type {Client} from "webstomp-client";
 import Stomp, {Frame} from "webstomp-client";
-import type {UserType} from "@/types/model/UserTypes";
-import SockJS from "sockjs-client";
-import {useRoomStore} from "@/stores/model/RoomStore";
+/*import SockJS from "sockjs-client";*/
+import SockJS from 'sockjs-client/dist/sockjs.js';
 import {useUserStore} from "@/stores/userStore";
+import {useRoomStore} from "@/stores/roomStore";
 
 export const useWebSocketStore = defineStore('web-socket', () => {
   const socket = ref<any>();
   const stompClient = ref<Client>();
   const userStore = useUserStore();
+  const roomStore = useRoomStore();
 
   const connect = (username: string) => {
     const URL = import.meta.env.VITE_BACKEND_URL + '/ws-chatapp';
@@ -22,6 +23,8 @@ export const useWebSocketStore = defineStore('web-socket', () => {
         async (frame) => {
           console.log(frame);
 
+          await userStore.subscribeTopicUser();
+          await roomStore.subscribeTopicRoom();
           stompClient.value?.send(`/ws/user.connect/${username}`);
 
           window.addEventListener('beforeunload', disconnect);
