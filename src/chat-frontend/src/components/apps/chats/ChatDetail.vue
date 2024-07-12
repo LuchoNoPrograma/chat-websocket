@@ -69,10 +69,23 @@ const scrollToBottom = () => {
   }
 }
 
-const handleArrowClickToBottom = () => {
-  scrollToBottom();
+const scrollToBottomIfNearBottom  = () => {
+  const container = scrollbarApi.value?.ps?.element;
+  console.log(container)
+  const distanceFromBottom = container.scrollHeight - container.scrollTop;
+
+  console.log('distanceFromBottom:', distanceFromBottom);
+  if (distanceFromBottom <= 1000) {
+    container.scrollTop = container.scrollHeight;
+  }else{
+    newMessageCount.value += 1;
+    newMessageFromOthers.value = true;
+  }
+}
+
+const clearCountNewMessages = () => {
   newMessageCount.value = 0;
-  /*newMessageFromOthers.value = false;*/
+  newMessageFromOthers.value = false;
 }
 
 watchEffect(async () => {
@@ -91,10 +104,9 @@ onMounted(async () => {
       const isCurrentUser = chatMessage.userId === userStore.userConnected?.username
       if (isCurrentUser) {
         scrollToBottom();
-      } else {
-        newMessageCount.value += 1;
-        newMessageFromOthers.value = true;
       }
+
+      scrollToBottomIfNearBottom();
     });
   });
 
@@ -136,7 +148,7 @@ onBeforeUnmount(() => {
     <v-divider/>
     <!---Chat History-->
     <v-container>
-      <perfect-scrollbar class="rightpartHeight" :options="{minScrollbarLength: 20}" ref="scrollbarApi">
+      <perfect-scrollbar class="rightpartHeight" :options="{minScrollbarLength: 20}" ref="scrollbarApi" @ps-y-reach-end="clearCountNewMessages">
         <div class="d-flex flex-column">
           <div v-for="chatMessage in roomStore.selectedRoom?.chatMessages" :key="chatMessage.id" class="px-4 pt-4"
           >
@@ -205,9 +217,9 @@ onBeforeUnmount(() => {
       </perfect-scrollbar>
     </v-container>
     <v-divider/>
-    <!---Chat send-->
+<!--    v-if="newMessageFromOthers"-->
     <div class="container__new-message d-flex ga-1 align-center">
-      <v-btn @click="handleArrowClickToBottom" class="elevation-10"
+      <v-btn @click="scrollToBottom" class="elevation-10"
              color="info" size="x-small" icon variant="flat">
         <v-badge :content="newMessageCount" color="error" :offset-y="-10" :offset-x="-5">
           <v-icon size="18" icon="mdi-chevron-double-down"></v-icon>
@@ -224,7 +236,7 @@ onBeforeUnmount(() => {
 
 .container__new-message {
   position: absolute;
-  bottom: 20%;
+  bottom: 21.5%;
   right: 11.5%;
 }
 
