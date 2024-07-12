@@ -35,13 +35,6 @@ export const useChatStore = defineStore('chat', () => {
       onChatUpdate(payload);
     });
 
-    webSocketStore.stompClient?.send('/ws/chat.send-message-room', JSON.stringify({
-      type: MessageType.JOIN,
-      format: MessageFormat.TEXT,
-      roomId: roomStore.selectedRoom?.id,
-      userId: userStore.userConnected?.username
-    }));
-
     if (subscription) {
       subscribedChatRooms.value[room.id] = subscription
     }
@@ -49,13 +42,6 @@ export const useChatStore = defineStore('chat', () => {
 
   //Leave chat room
   const unsubscribeChatRoom = (room: RoomType) => {
-    webSocketStore.stompClient?.send('/ws/chat.send-message-room', JSON.stringify({
-      type: MessageType.LEAVE,
-      format: MessageFormat.TEXT,
-      roomId: roomStore.selectedRoom?.id,
-      userId: userStore.userConnected?.username
-    }))
-
     //custom header to handle unsubscribe event in Spring Boot
     webSocketStore?.stompClient?.unsubscribe(subscribedChatRooms.value[room.id].id, {
       destination: '/topic/chat/room/' + room.id

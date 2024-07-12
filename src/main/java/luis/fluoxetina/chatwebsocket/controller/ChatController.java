@@ -1,28 +1,21 @@
 package luis.fluoxetina.chatwebsocket.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luis.fluoxetina.chatwebsocket.dto.ChatMessageDto;
-import luis.fluoxetina.chatwebsocket.dto.RoomDto;
-import luis.fluoxetina.chatwebsocket.dto.UserDto;
-import luis.fluoxetina.chatwebsocket.enums.MessageType;
 import luis.fluoxetina.chatwebsocket.mapper.ChatMessageMapper;
 import luis.fluoxetina.chatwebsocket.mapper.RoomMapper;
 import luis.fluoxetina.chatwebsocket.model.doc.ChatMessage;
-import luis.fluoxetina.chatwebsocket.model.doc.Room;
-import luis.fluoxetina.chatwebsocket.model.doc.User;
 import luis.fluoxetina.chatwebsocket.model.service.ChatMessageService;
 import luis.fluoxetina.chatwebsocket.model.service.RoomService;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,17 +28,9 @@ public class ChatController {
   private final RoomMapper roomMapper;
 
   @MessageMapping("/chat.send-message-room")
-  public void sendMessage(@Payload ChatMessageDto chatMessageDto) {
+  public void sendChatMessage(@Valid @Payload ChatMessageDto chatMessageDto) {
+    chatMessageDto.getBody().trim();
     ChatMessage chatMessagePersisted = chatMessageService.save(chatMessageMapper.toDocument(chatMessageDto));
-
-    if(chatMessageDto.getType().equals(MessageType.JOIN)){
-      Room room = roomService.joinRoom(chatMessageDto.getRoomId(), chatMessageDto.getUserId());
-      messagingTemplate.convertAndSend("/topic/room", roomMapper.toDto(room));
-    }else if(chatMessageDto.getType().equals(MessageType.LEAVE)){
-      Room room = roomService.leaveRoom(chatMessageDto.getRoomId(), chatMessageDto.getUserId());
-      messagingTemplate.convertAndSend("/topic/room", roomMapper.toDto(room));
-    }
-
     log.info("Message chat: {}", chatMessagePersisted);
     chatMessageMapper.toDto(chatMessagePersisted);
     messagingTemplate.convertAndSend("/topic/chat/room/" + chatMessageDto.getRoomId(), chatMessageMapper.toDto(chatMessagePersisted));
