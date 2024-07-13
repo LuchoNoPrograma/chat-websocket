@@ -14,18 +14,15 @@ export const useUserStore = defineStore('user', () => {
   const subscribeTopicUser = async () => {
     const response = await axiosServices.get('/api/v1/user-online')
     userOnlineList.value = response.data;
+    userOnlineList.value = userOnlineList.value.filter(user => user.username !== userConnected.value?.username);
+    userOnlineList.value.unshift(userConnected.value as UserType);
 
     webSocketStore?.stompClient?.subscribe('/topic/user', (message: Message) => {
       const payload: UserType = JSON.parse(message.body);
 
-      if(!userConnected.value){
-        userConnected.value = payload;
-      }
       userOnlineList.value = userOnlineList.value.filter(user => user.username !== payload.username);
-      if(payload.online){
-        userOnlineList.value.unshift(payload);
-      }else{
-        userConnected.value = undefined;
+      if (payload.online && payload.username !== userConnected.value?.username) {
+        userOnlineList.value.push(payload);
       }
     })
   }

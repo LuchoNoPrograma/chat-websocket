@@ -9,26 +9,31 @@ import luis.fluoxetina.chatwebsocket.model.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.config.SimpleBrokerRegistration;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.socket.config.WebSocketMessageBrokerStats;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.HashMap;
 
+@Log4j2
 @RestController
 @RequiredArgsConstructor
-@Log4j2
 @CrossOrigin({"*"})
-public class UserController {
+public class SimpleLoginController {
+  private final SimpMessagingTemplate messagingTemplate;
   private final UserService userService;
   private final UserMapper userMapper;
 
-  @GetMapping("/api/v1/user-online")
-  public List<UserDto> findAllOnline(@RequestParam(defaultValue = "true") boolean online) {
-    return userService.findAllByOnline(online).stream().map(userMapper::toDto).toList();
+  @PostMapping("/api/v1/auth")
+  public ResponseEntity<UserDto> simpleLogin(@RequestParam String username){
+    User userProcessed = userService.connect(username);
+    messagingTemplate.convertAndSend("/topic/user", userProcessed);
+
+    //Attribute username saved in Stomp session in WebSocketEventListener.java
+    log.info("User Connected: "+username);
+    return ResponseEntity.ok(userMapper.toDto(userProcessed));
   }
 }

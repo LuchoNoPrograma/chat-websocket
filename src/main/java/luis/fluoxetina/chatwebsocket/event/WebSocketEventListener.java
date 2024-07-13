@@ -17,9 +17,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
+import org.springframework.web.socket.messaging.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +36,15 @@ public class WebSocketEventListener {
   private final ChatMessageMapper chatMessageMapper;
 
   @EventListener
-  public void handleWebSocketDisconnect(SessionDisconnectEvent event) {
+  public void handleWebsocketConnect(SessionConnectEvent event){
+    StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+    String username = headerAccessor.getLogin();
+
+    headerAccessor.getSessionAttributes().put("username", username);
+  }
+
+  @EventListener
+  public void handleWebSocketDisconnected(SessionDisconnectEvent event) {
     StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
     String username = (String) headerAccessor.getSessionAttributes().get("username");
 

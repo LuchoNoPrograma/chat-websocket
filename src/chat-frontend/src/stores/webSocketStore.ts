@@ -7,6 +7,8 @@ import SockJS from 'sockjs-client/dist/sockjs.js';
 import {useUserStore} from "@/stores/userStore";
 import {useRoomStore} from "@/stores/roomStore";
 import {useChatStore} from "@/stores/chatStore";
+import axiosServices from "@/utils/axios";
+import type {UserType} from "@/types/model/UserTypes";
 
 export const useWebSocketStore = defineStore('web-socket', () => {
   const socket = ref<any>();
@@ -21,13 +23,17 @@ export const useWebSocketStore = defineStore('web-socket', () => {
     stompClient.value = Stomp.over(socket.value);
 
     stompClient.value.connect(
-        {},
+        {login: username},
         async (frame) => {
           console.log(frame);
 
+          const response = await axiosServices.post<UserType>("/api/v1/auth", null,  {
+            params: {username: username}
+          })
+          userStore.userConnected = response.data;
+
           await userStore.subscribeTopicUser();
           await roomStore.subscribeTopicRoom();
-          stompClient.value?.send(`/ws/user.connect/${username}`);
 
           window.addEventListener('beforeunload', disconnect);
         },

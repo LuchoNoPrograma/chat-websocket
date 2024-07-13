@@ -30,7 +30,6 @@ export const useChatStore = defineStore('chat', () => {
 
     const subscription = webSocketStore.stompClient?.subscribe(`/topic/chat/room/${room.id}`, (message: Message) => {
       const payload: ChatMessageType = JSON.parse(message.body);
-      console.log(payload);
       roomStore.selectedRoom?.chatMessages?.push(payload)
       onChatUpdate(payload);
     });

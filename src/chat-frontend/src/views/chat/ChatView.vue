@@ -10,6 +10,7 @@ import maleProfile from "@/assets/images/chat/default-male-profile.png";
 import type {RoomType} from "@/types/model/RoomTypes";
 import {useUserStore} from "@/stores/userStore";
 import {useRoomStore} from "@/stores/roomStore";
+import type {UserType} from "@/types/model/UserTypes";
 
 const chatStore = useChatStore();
 const roomStore= useRoomStore();
@@ -18,11 +19,7 @@ const router = useRouter();
 
 const window = ref<number>(0);
 
-
-const logout = async () => {
-  chatStore.disconnect();
-  await router.push('/auth/register')
-}
+const isCurrentUser = (user: UserType) => user.username === userStore.userConnected?.username
 
 const enterRoom = async (room: RoomType) => {
   await router.push({path: `/room/${room.id}`, replace: true})//ChatDetail.vue
@@ -49,17 +46,17 @@ const enterRoom = async (room: RoomType) => {
           <v-list>
             <perfect-scrollbar class="h-100">
               <v-list-item v-for="(user, index) in userStore.userOnlineList" :key="index" class="mx-0 pa-0">
-                <div :class="{'border-b-0': index < userStore.userOnlineList.length - 1}"
+                <div :class="{'border-b-0': index < userStore.userOnlineList.length - 1, 'bg-lightsuccess': isCurrentUser(user)}"
                      class="py-2 pl-4 w-100 d-flex align-center justify-space-between border border-sm border-s-0 border-e-0">
                   <div class="d-flex align-center gap-2">
                     <img :src="maleProfile" alt="male-profile" class="obj-cover rounded-circle" height="48px"
                          width="48px">
                     <v-list-item-title>
-                      <span class="textPrimary text-h6">{{ user.username }}</span>
+                      <span class="textPrimary text-h6">{{ isCurrentUser(user) ? 'Tú' : user.username }}</span>
                     </v-list-item-title>
                   </div>
 
-                  <v-list-item :ripple="false">
+                  <v-list-item :ripple="false" v-if="!isCurrentUser(user)">
                     <v-btn color="primary" elevation="10" icon size="30" varant="outlined">
                       <v-icon icon="mdi-email-fast"></v-icon>
                     </v-btn>
