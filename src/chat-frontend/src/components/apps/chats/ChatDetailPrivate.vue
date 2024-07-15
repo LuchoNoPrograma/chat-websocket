@@ -7,36 +7,11 @@ import {es} from 'date-fns/locale';
 
 import {type ChatMessageType, MessageFormat, MessageType} from '@/types/apps/ChatMessageType';
 import {useRouter} from "vue-router";
-import {useRoomStore} from "@/stores/roomStore";
 import {useUserStore} from "@/stores/userStore";
 
+import maleProfile from "@/assets/images/chat/default-male-profile.png";
 const chatStore = useChatStore();
-const roomStore = useRoomStore();
 const userStore = useUserStore();
-
-const router = useRouter();
-
-const colors = [
-  '#e71c10', '#ff2683', '#bc07dc', '#314ad0',
-  '#2196F3', '#129f18', '#d78f0d', '#ea4715'
-];
-
-const userColors = new Map();
-
-function getRandomColor() {
-  if (colors.length === 0) return '#000000'; // Default color if colors run out
-  const randomIndex = Math.floor(Math.random() * colors.length);
-  return colors.splice(randomIndex, 1)[0];
-}
-
-function getUserColor(userId) {
-  if (!userColors.has(userId)) {
-    const color = getRandomColor();
-    userColors.set(userId, color);
-  }
-  return userColors.get(userId);
-}
-
 function updateTimes() {
   const chatMessages = chatStore.selectedRoom?.chatMessages;
   if (chatMessages) {
@@ -79,27 +54,8 @@ const clearCountNewMessages = () => {
   newMessageFromOthers.value = false;
 }
 
-watchEffect(async () => {
-  roomStore.selectedRoom = await roomStore.getRoomById(router.currentRoute.value.params.roomId as string);
-})
-
-const leaveRoom = () => {
-  chatStore.unsubscribeChatRoom(roomStore.selectedRoom);
-  router.replace('/chat');
-}
-
 onMounted(async () => {
-  roomStore.selectedRoom = await roomStore.getRoomById(router.currentRoute.value.params.roomId as string);
-  chatStore.subscribeChatRoom(roomStore.selectedRoom, (chatMessage: ChatMessageType) => {
-    nextTick(() => {
-      const isCurrentUser = chatMessage.userId === userStore.userConnected?.username
-      if (isCurrentUser) {
-        scrollToBottom();
-      }
-
-      scrollToBottomIfNearBottom();
-    });
-  });
+  //Chat history with target user is already laoded in parent component
 
   updateTimes();
   window.addEventListener('focus', updateTimes);
@@ -111,14 +67,14 @@ onBeforeUnmount(() => {
   window.removeEventListener('focus', updateTimes);
 });
 
-const sendMessageToRoomAndClear = () => {
+const sendMessageToUserAndClear = () => {
   chatStore.sendMessage({
     body: chatStore.chatMessageContent,
     type: MessageType.CHAT,
     format: MessageFormat.TEXT,
-    roomId: roomStore.selectedRoom?.id,
+    userRecipientId: chatStore.chatUserPrivate.userRecipient?.username,
     userId: userStore.userConnected?.username
-  });
+  }, 'PRIVATE');
 }
 </script>
 <template>
@@ -126,9 +82,9 @@ const sendMessageToRoomAndClear = () => {
     <v-sheet class="mx-4 py-2 px-4 rounded elevation-10 d-flex align-center justify-space-between">
       <div class="d-flex align-center gap-3">
         <img class="d-inline overflow-hidden" style="border-radius: 100%; object-fit: cover" width="48px" height="48px"
-             :src="roomStore.selectedRoom?.imgPortrait" alt="1">
+             :src="maleProfile" alt="1">
         <h3 class="font-weight-medium d-inline">
-          {{ roomStore.selectedRoom?.name }}
+          {{ chatStore.chatUserPrivate?.userRecipient?.username }}
           Eres: {{ userStore.userConnected?.username }}
         </h3>
       </div>
@@ -138,12 +94,6 @@ const sendMessageToRoomAndClear = () => {
             <v-icon icon="mdi-dots-vertical"></v-icon>
           </v-btn>
         </template>
-
-        <v-list>
-          <v-list-item class="pe-10" @click="leaveRoom">
-            Abandonar la sala
-          </v-list-item>
-        </v-list>
       </v-menu>
     </v-sheet>
     <v-divider/>
@@ -151,66 +101,37 @@ const sendMessageToRoomAndClear = () => {
     <v-container>
       <perfect-scrollbar class="rightpartHeight" :options="{minScrollbarLength: 20}" ref="scrollbarApi" @ps-y-reach-end="clearCountNewMessages">
         <div class="d-flex flex-column">
-          <div v-for="chatMessage in roomStore.selectedRoom?.chatMessages" :key="chatMessage.id" class="px-4 pt-4"
+          <div v-for="chatMessage in chatStore.chatUserPrivate.chatHistory" :key="chatMessage.id" class="px-4 pt-4"
           >
-            <div v-if="chatMessage.type === MessageType.JOIN" class="d-flex justify-center">
-              <v-sheet class="w-fit-content px-4 py-1 text-center"
-                       color="success" elevation="10" rounded="md">
-                <span class="font-weight-semibold">{{ chatMessage.userId }}</span> se ha unido
-              </v-sheet>
-            </div>
-            <div v-else-if="chatMessage.type === MessageType.LEAVE" class="d-flex justify-center">
-              <v-sheet class="w-fit-content px-4 py-1 text-center"
-                       color="error" elevation="10" rounded="md">
-                <span class="font-weight-semibold">{{ chatMessage.userId }}</span> salió
-              </v-sheet>
-            </div>
-            <div
-              v-else-if="chatMessage.type === MessageType.CHAT && chatMessage.userId === userStore.userConnected?.username"
-              class="justify-end d-flex text-end mb-1">
+            <div v-if="chatMessage.userId === userStore.userConnected?.username" class="justify-end d-flex text-end mb-1">
               <div class="d-flex flex-column align-end">
                 <v-sheet
-                  color="info"
-                  v-if="chatMessage.format === MessageFormat.TEXT"
-                  class="rounded-md px-2 py-1 mb-1 text-left"
-                  style="max-width: 320px; width: fit-content"
+                    color="info"
+                    v-if="chatMessage.format === MessageFormat.TEXT"
+                    class="rounded-md px-2 py-1 mb-1 text-left"
+                    style="max-width: 320px; width: fit-content"
                 >
                   <p class="text-body-1" style="white-space: pre-line">{{ chatMessage.body }}</p>
                 </v-sheet>
                 <small v-if="chatMessage" class="text-subtitle-2 ml-1">
                   {{ chatMessage.relativeTime ? `Hace ${chatMessage.relativeTime}` : 'Ahora' }}
                 </small>
-                <!--                <v-sheet
-                                    v-if="chatMessage.messageFormat !== MessageFormat.IMG"
-                                    class="bg-grey100 rounded-md px-3 py-2 mb-1"
-                                >
-                                  <p class="text-body-1">{{ chatMessage.content }}</p>
-                                </v-sheet>
-                                <v-sheet v-if="chatMessage.messageFormat === MessageFormat.IMG" class="mb-1">
-                                  <img :src="chatMessage.content" alt="pro" class="rounded-md" width="250"/>
-                                </v-sheet>-->
               </div>
             </div>
             <div v-else class="d-flex align-items-start gap-3 mb-1">
               <div>
                 <v-sheet
-                  elevation="10"
-                  v-if="chatMessage.format === MessageFormat.TEXT"
-                  color="surface"
-                  class="rounded-md px-3 py-1"
-                  style="max-width: 320px;"
+                    elevation="10"
+                    v-if="chatMessage.format === MessageFormat.TEXT"
+                    color="surface"
+                    class="rounded-md px-3 py-1"
+                    style="max-width: 320px;"
                 >
-                <span class="message__username" :style="{ color: getUserColor(chatMessage.userId) }">
-                  ~ {{ chatMessage.userId }}
-                </span>
                   <p class="text-body-1" style="white-space: pre-line">{{ chatMessage.body }}</p>
                 </v-sheet>
                 <small v-if="chatMessage.createdAt" class="text-subtitle-2 ml-1">
                   {{ chatMessage.relativeTime ? `Hace ${chatMessage.relativeTime}` : 'Ahora' }}
                 </small>
-                <!--                <v-sheet v-if="chatMessage.format === MessageFormat.IMG" class="mb-1">
-                                  <img :src="chatMessage.body" alt="pro" class="rounded-md" width="250"/>
-                                </v-sheet>-->
               </div>
             </div>
           </div>
@@ -218,7 +139,7 @@ const sendMessageToRoomAndClear = () => {
       </perfect-scrollbar>
     </v-container>
     <v-divider/>
-<!--    v-if="newMessageFromOthers"-->
+    <!--    v-if="newMessageFromOthers"-->
     <div class="container__new-message d-flex ga-1 align-center">
       <v-btn @click="scrollToBottom" class="elevation-10"
              color="info" size="x-small" icon variant="flat">
@@ -227,7 +148,7 @@ const sendMessageToRoomAndClear = () => {
         </v-badge>
       </v-btn>
     </div>
-    <chat-send-msg @send-message="sendMessageToRoomAndClear"></chat-send-msg>
+    <chat-send-msg @send-message="sendMessageToUserAndClear"></chat-send-msg>
   </div>
 </template>
 <style lang="scss">

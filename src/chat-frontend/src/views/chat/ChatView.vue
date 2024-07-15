@@ -24,6 +24,11 @@ const isCurrentUser = (user: UserType) => user.username === userStore.userConnec
 const enterRoom = async (room: RoomType) => {
   await router.push({path: `/room/${room.id}`, replace: true})//ChatDetail.vue
 }
+
+const enterChatUserPrivate = async (userTarget: UserType) => {
+  await chatStore.loadChatUserPrivate(userTarget);
+  await router.push('/chat/private');
+}
 </script>
 
 <template>
@@ -57,7 +62,7 @@ const enterRoom = async (room: RoomType) => {
                   </div>
 
                   <v-list-item :ripple="false" v-if="!isCurrentUser(user)">
-                    <v-btn color="primary" elevation="10" icon size="30" varant="outlined">
+                    <v-btn color="primary" elevation="10" icon size="30" varant="outlined" @click="enterChatUserPrivate(user)">
                       <v-icon icon="mdi-email-fast"></v-icon>
                     </v-btn>
                   </v-list-item>

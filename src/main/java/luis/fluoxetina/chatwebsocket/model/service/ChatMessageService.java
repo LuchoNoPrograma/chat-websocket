@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import luis.fluoxetina.chatwebsocket.model.doc.ChatMessage;
 import luis.fluoxetina.chatwebsocket.model.repository.ChatMessageRepository;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -24,5 +26,9 @@ public class ChatMessageService {
 
   public List<ChatMessage> findAllByRoomId(String roomId) {
     return chatMessageRepository.findAllByRoomId(roomId);
+  }
+
+  public List<ChatMessage> findByUserIdAndUserReceiverId(String userId, String userRecipientId){
+    return chatMessageRepository.findByUserIdAndUserRecipientId(userId, userRecipientId);
   }
 }

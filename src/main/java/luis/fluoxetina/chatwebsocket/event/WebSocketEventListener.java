@@ -19,6 +19,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class WebSocketEventListener {
     StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
     String username = headerAccessor.getLogin();
 
+    headerAccessor.setUser(() -> username);
     headerAccessor.getSessionAttributes().put("username", username);
   }
 

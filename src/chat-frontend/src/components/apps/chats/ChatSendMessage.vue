@@ -9,6 +9,10 @@ const chatStore = useChatStore();
 const roomStore = useRoomStore();
 const userStore = useUserStore();
 
+const emits = defineEmits({
+  'send-message': () => true
+});
+
 const textareaRef = ref<any>();
 const resizeTextarea = () => {
   if (textareaRef.value) {
@@ -17,19 +21,12 @@ const resizeTextarea = () => {
 
 }
 
-const sendMessageAndClear = () => {
+const sendMessageAndResizeTextArea = () => {
   if (chatStore.chatMessageContent?.length === 0) {
     return
   }
 
-  chatStore.sendMessage({
-    body: chatStore.chatMessageContent,
-    type: MessageType.CHAT,
-    format: MessageFormat.TEXT,
-    roomId: roomStore.selectedRoom?.id,
-    userId: userStore.userConnected?.username
-  });
-
+  emits('send-message');
   chatStore.chatMessageContent = '';
 
   nextTick(() => {
@@ -47,7 +44,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
     });
   } else if (event.key === 'Enter') {
     event.preventDefault();
-    sendMessageAndClear();
+    emits('send-message');
   }
 }
 </script>
@@ -74,7 +71,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
     </v-textarea>
     <v-btn :disabled="chatStore.chatMessageContent?.replace(/\s/g,'') == ''" class="text-medium-emphasis" icon
            type="submit" variant="text"
-           @click="sendMessageAndClear"
+           @click="sendMessageAndResizeTextArea"
     >
       <send-icon size="20"></send-icon>
     </v-btn>

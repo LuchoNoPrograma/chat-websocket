@@ -1,3 +1,5 @@
+import type {UserType} from "@/types/model/UserTypes";
+
 type attachType = {
     icon?: string;
     file?: string;
@@ -24,8 +26,7 @@ export type ChatType = {
 };
 */
 export type ChatType = {
-    id?: string,
-    username?: string,
+    userRecipient?: UserType,
     chatHistory: ChatMessageType[],
 }
 
@@ -49,6 +50,7 @@ export type ChatMessageType = {
 
     roomId?: string;
     userId?: string;
+    userRecipientId?: string;
 };
 
 /*
