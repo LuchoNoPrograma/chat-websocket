@@ -11,10 +11,6 @@ export default [
       path: '/room/:roomId',
       name: 'ChatDetail',
       component: () => import('@/components/apps/chats/ChatDetail.vue')
-    }, {
-      path: 'private',
-      name: 'ChatPrivate',
-      component: () => import('@/components/apps/chats/ChatDetailPrivate.vue')
     }]
   }
 ];

@@ -12,6 +12,4 @@ import java.util.List;
 public interface ChatMessageRepository extends MongoRepository<ChatMessage, String> {
   @Query("{'roomId' : ?0}")
   List<ChatMessage> findAllByRoomId(String roomId);
-
-  List<ChatMessage> findByUserIdAndUserRecipientId(String userId, String userRecipientId);
 }

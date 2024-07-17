@@ -21,7 +21,6 @@ public class ChatMessageDto {
   @NotNull
   private String userId; //sender
   private String roomId; //destination room
-  private String userRecipientId; //recipient for private messages  `
 
   private String body;
 

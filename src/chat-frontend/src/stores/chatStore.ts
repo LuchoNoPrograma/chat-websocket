@@ -2,30 +2,17 @@ import {defineStore} from 'pinia';
 import {ref} from 'vue';
 import type {ChatMessageType, ChatType} from '@/types/apps/ChatMessageType';
 import type {Message, Subscription} from 'webstomp-client';
-import type {UserType} from "@/types/model/UserTypes";
-import axiosServices from "@/utils/axios";
 import type {RoomType} from "@/types/model/RoomTypes";
 import {useWebSocketStore} from "@/stores/webSocketStore";
 import {useRoomStore} from "@/stores/roomStore";
-import {useUserStore} from "@/stores/userStore";
 
 export const useChatStore = defineStore('chat', () => {
   const webSocketStore = useWebSocketStore();
   const roomStore = useRoomStore();
-  const userStore = useUserStore();
 
   const subscribedChatRooms = ref<{ [key: string]: Subscription }>({});
 
   const chatMessageContent = ref<string>('');
-  const chatUserPrivate = ref<ChatType>({
-    chatHistory: []
-  });
-
-  const subscribeChatUserPrivate = () => {
-    webSocketStore?.stompClient?.subscribe(`/user/${userStore.userConnected?.username}/private`, (message: Message) => {
-      chatUserPrivate.value.chatHistory.push(JSON.parse(message.body));
-    });
-  }
 
   //Join chat room
   const subscribeChatRoom = (room: RoomType, onChatUpdate: (body: ChatMessageType) => void) => {
@@ -61,20 +48,8 @@ export const useChatStore = defineStore('chat', () => {
     chatMessageContent.value = '';
   };
 
-  const loadChatUserPrivate = async (userTarget: UserType) => {
-    try {
-      chatUserPrivate.value.userRecipient = userTarget;
-
-      const responseChatMessages = await axiosServices.get<ChatMessageType[]>(`/api/v1/chat/${userStore.userConnected?.username}/private/${userTarget.username}`);
-      chatUserPrivate.value.chatHistory = responseChatMessages.data
-      return responseChatMessages.data
-    } catch (error) {
-      console.log(error)
-    }
-  };
-
   return {
-    chatMessageContent, chatUserPrivate, subscribeChatRoom, subscribeChatUserPrivate, unsubscribeChatRoom,
-    sendMessage, loadChatUserPrivate
+    chatMessageContent, subscribeChatRoom, unsubscribeChatRoom,
+    sendMessage
   };
 });

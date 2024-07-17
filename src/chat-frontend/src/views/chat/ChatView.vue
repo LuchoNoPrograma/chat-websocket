@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 // common components
 import AppBaseCard from '@/components/shared/AppBaseCard.vue';
-import {useChatStore} from "@/stores/chatStore";
 import {useRouter} from "vue-router";
 import ChatHeader from "@/components/apps/chats/ChatHeader.vue";
 import {ref} from "vue";
@@ -12,7 +11,6 @@ import {useUserStore} from "@/stores/userStore";
 import {useRoomStore} from "@/stores/roomStore";
 import type {UserType} from "@/types/model/UserTypes";
 
-const chatStore = useChatStore();
 const roomStore= useRoomStore();
 const userStore= useUserStore();
 const router = useRouter();
@@ -23,11 +21,6 @@ const isCurrentUser = (user: UserType) => user.username === userStore.userConnec
 
 const enterRoom = async (room: RoomType) => {
   await router.push({path: `/room/${room.id}`, replace: true})//ChatDetail.vue
-}
-
-const enterChatUserPrivate = async (userTarget: UserType) => {
-  await chatStore.loadChatUserPrivate(userTarget);
-  await router.push('/chat/private');
 }
 </script>
 
@@ -60,12 +53,6 @@ const enterChatUserPrivate = async (userTarget: UserType) => {
                       <span class="textPrimary text-h6">{{ isCurrentUser(user) ? 'Tú' : user.username }}</span>
                     </v-list-item-title>
                   </div>
-
-                  <v-list-item :ripple="false" v-if="!isCurrentUser(user)">
-                    <v-btn color="primary" elevation="10" icon size="30" varant="outlined" @click="enterChatUserPrivate(user)">
-                      <v-icon icon="mdi-email-fast"></v-icon>
-                    </v-btn>
-                  </v-list-item>
                 </div>
               </v-list-item>
             </perfect-scrollbar>

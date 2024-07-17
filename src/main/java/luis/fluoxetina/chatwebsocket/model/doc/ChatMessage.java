@@ -22,7 +22,6 @@ public class ChatMessage {
 
   private String roomId;
   private String userId; //sender
-  private String userRecipientId; //recipient
 
   private String body;
   private MessageType type;

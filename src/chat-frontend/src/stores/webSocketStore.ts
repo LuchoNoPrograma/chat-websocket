@@ -34,7 +34,6 @@ export const useWebSocketStore = defineStore('web-socket', () => {
 
           await userStore.subscribeTopicUser();
           await roomStore.subscribeTopicRoom();
-          await chatStore.subscribeChatUserPrivate();
 
           window.addEventListener('beforeunload', disconnect);
         },
