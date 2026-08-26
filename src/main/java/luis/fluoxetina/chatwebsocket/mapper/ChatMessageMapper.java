@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 public class ChatMessageMapper {
   public ChatMessage toDocument(ChatMessageDto chatMessageDto) {
     return ChatMessage.builder()
+            .id(chatMessageDto.getId())
             .userId(chatMessageDto.getUserId())
             .roomId(chatMessageDto.getRoomId())
             .body(chatMessageDto.getBody())
@@ -19,6 +20,7 @@ public class ChatMessageMapper {
 
   public ChatMessageDto toDto(ChatMessage chatMessage) {
     return ChatMessageDto.builder()
+            .id(chatMessage.getId())
             .userId(chatMessage.getUserId())
             .roomId(chatMessage.getRoomId())
             .body(chatMessage.getBody())

@@ -7,12 +7,12 @@ const items = ref([
     'Combo with Solo',
     'The Dark',
     'Fight Club',
-    'demo@company.com',
+    'user@company.com',
     'Pulp Fiction'
 ]);
 const value = ref(['The Dark Knight']);
-const cap_value = ref(['demo@company.com']);
-const cap_value2 = ref(['demo@company.com']);
+const cap_value = ref(['user@company.com']);
+const cap_value2 = ref(['user@company.com']);
 const multi_value = ref(['The Dark Knight', 'Fight Club']);
 </script>
 <template>

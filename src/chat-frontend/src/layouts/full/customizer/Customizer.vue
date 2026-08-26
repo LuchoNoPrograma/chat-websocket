@@ -131,7 +131,7 @@ const DarkthemeColors = ref([
                     Full
                 </v-btn>
             </v-btn-toggle>
-            <!---Horizontal demo hide this option --->
+            <!-- Horizontal layout hides this option -->
             <v-sheet v-if="customizer.setHorizontalLayout != true">
             <h6 class="text-h6 mt-11 mb-2">Sidebar Type</h6>
             <v-btn-toggle v-model="customizer.mini_sidebar" color="primary" class="my-2 btn-group-custom gap-3" rounded="0" group>

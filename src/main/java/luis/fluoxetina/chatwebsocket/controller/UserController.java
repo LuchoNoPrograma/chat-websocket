@@ -12,7 +12,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
-@CrossOrigin({"*"})
 public class UserController {
   private final UserService userService;
   private final UserMapper userMapper;

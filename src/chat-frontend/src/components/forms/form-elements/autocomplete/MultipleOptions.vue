@@ -6,7 +6,7 @@ const items2 = ref([
     'Combo with Solo',
     'The Dark',
     'Fight Club',
-    'demo@company.com',
+    'user@company.com',
     'Pulp Fiction'
 ]);
 const value = ref(['The Dark Knight']);

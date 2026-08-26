@@ -8,7 +8,7 @@ const items = ref([
     'Combo with Solo',
     'The Dark',
     'Fight Club',
-    'demo@company.com',
+    'user@company.com',
     'Pulp Fiction'
 ]);
 </script>

@@ -3,13 +3,10 @@ package luis.fluoxetina.chatwebsocket.model.service;
 import lombok.RequiredArgsConstructor;
 import luis.fluoxetina.chatwebsocket.model.doc.ChatMessage;
 import luis.fluoxetina.chatwebsocket.model.repository.ChatMessageRepository;
-import org.bson.types.ObjectId;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -17,6 +14,7 @@ import java.util.List;
 public class ChatMessageService {
   private final ChatMessageRepository chatMessageRepository;
 
+  @Transactional
   public ChatMessage save(ChatMessage chatMessage) {
     if (chatMessage.getId() == null) {
       chatMessage.setCreatedAt(ZonedDateTime.now());
@@ -24,7 +22,8 @@ public class ChatMessageService {
     return chatMessageRepository.save(chatMessage);
   }
 
+  @Transactional(readOnly = true)
   public List<ChatMessage> findAllByRoomId(String roomId) {
-    return chatMessageRepository.findAllByRoomId(roomId);
+    return chatMessageRepository.findAllByRoomIdOrderByCreatedAtAsc(roomId);
   }
 }

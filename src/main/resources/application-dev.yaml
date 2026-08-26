@@ -1,11 +1,2 @@
 server:
-  port: 8081
-
-#  websocket:
-#    enabled: true
-
-spring:
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/chatMessageDB
-
+  port: ${PORT:8081}

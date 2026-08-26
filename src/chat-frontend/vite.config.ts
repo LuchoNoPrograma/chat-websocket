@@ -1,32 +1,20 @@
-import {fileURLToPath, URL} from 'url';
-import {defineConfig} from 'vite';
+import { fileURLToPath, URL } from 'node:url';
+import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
-import vuetify from 'vite-plugin-vuetify';
+import { defineConfig } from 'vite';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    vuetify({
-      autoImport: true,
-      styles: {configFile: 'src/scss/variables.scss'}
-    })
-  ],
+  plugins: [vue(), tailwindcss()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  css: {
-    preprocessorOptions: {
-      scss: {}
-    }
-  },
   server: {
     port: 8080
   },
-  optimizeDeps: {
-    exclude: ['vuetify'],
-    entries: ['./src/**/*.vue']
+  build: {
+    target: 'es2022',
+    sourcemap: true
   }
 });

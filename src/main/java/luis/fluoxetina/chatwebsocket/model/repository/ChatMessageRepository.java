@@ -1,15 +1,10 @@
 package luis.fluoxetina.chatwebsocket.model.repository;
 
 import luis.fluoxetina.chatwebsocket.model.doc.ChatMessage;
-import org.bson.types.ObjectId;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ChatMessageRepository extends MongoRepository<ChatMessage, String> {
-  @Query("{'roomId' : ?0}")
-  List<ChatMessage> findAllByRoomId(String roomId);
+public interface ChatMessageRepository extends JpaRepository<ChatMessage, String> {
+  List<ChatMessage> findAllByRoomIdOrderByCreatedAtAsc(String roomId);
 }

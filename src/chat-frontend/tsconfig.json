@@ -1,19 +1,13 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+  "include": ["env.d.ts", "src/main.ts", "src/App.vue", "src/modern/**/*.ts", "src/modern/**/*.vue"],
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "allowJs": true,
-    "noImplicitAny": false,
-    "skipLibCheck": true,
-    "noEmit": true
+    "strict": true,
+    "noEmit": true,
+    "types": ["vite/client"]
   },
-  "references": [
-    {
-      "path": "./tsconfig.vite-config.json"
-    }
-  ]
+  "references": [{ "path": "./tsconfig.vite-config.json" }]
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import luis.fluoxetina.chatwebsocket.enums.MessageFormat;
 import luis.fluoxetina.chatwebsocket.enums.MessageType;
+import luis.fluoxetina.chatwebsocket.exception.EntityNotFoundException;
 import luis.fluoxetina.chatwebsocket.mapper.ChatMessageMapper;
 import luis.fluoxetina.chatwebsocket.mapper.RoomMapper;
 import luis.fluoxetina.chatwebsocket.mapper.UserMapper;
@@ -19,9 +20,10 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.*;
 
-import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @RequiredArgsConstructor
@@ -35,14 +37,19 @@ public class WebSocketEventListener {
   private final UserMapper userMapper;
   private final RoomMapper roomMapper;
   private final ChatMessageMapper chatMessageMapper;
+  private final ConcurrentHashMap<String, Integer> connectedSessions = new ConcurrentHashMap<>();
 
   @EventListener
   public void handleWebsocketConnect(SessionConnectEvent event){
     StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-    String username = headerAccessor.getLogin();
+    String username = headerAccessor.getLogin() == null ? null : headerAccessor.getLogin().trim();
+    if (username == null || username.isBlank()) {
+      throw new IllegalArgumentException("A username is required to connect");
+    }
 
     headerAccessor.setUser(() -> username);
     headerAccessor.getSessionAttributes().put("username", username);
+    connectedSessions.merge(username, 1, Integer::sum);
   }
 
   @EventListener
@@ -52,17 +59,28 @@ public class WebSocketEventListener {
 
     if (username != null) {
       log.info("User Disconnected: {}", username);
-      User user = userService.disconnect(username);
-
-      messagingTemplate.convertAndSend("/topic/user", userMapper.toDto(user));
-      if (headerAccessor.getSessionAttributes().get("subscribedChatRooms") == null) return;
-
-      @SuppressWarnings("unchecked")
-      HashMap<String, String> subscribedRooms = (HashMap<String, String>) headerAccessor.getSessionAttributes().get("subscribedChatRooms");
-      subscribedRooms.forEach((key, value) -> {
-        this.processChatRoomActionType(value, user.getUsername(), MessageType.LEAVE);
-        log.info(user.getUsername() + " has unsubscribed from room: {}", value);
+      AtomicInteger remainingSessions = new AtomicInteger();
+      connectedSessions.compute(username, (key, count) -> {
+        int remaining = count == null ? 0 : Math.max(0, count - 1);
+        remainingSessions.set(remaining);
+        return remaining == 0 ? null : remaining;
       });
+      if (remainingSessions.get() == 0) {
+        try {
+          User user = userService.disconnect(username);
+          messagingTemplate.convertAndSend("/topic/user", userMapper.toDto(user));
+        } catch (EntityNotFoundException exception) {
+          log.debug("Ignoring disconnect for user that did not finish login: {}", username);
+        }
+      }
+      Set<String> subscribedRooms = getSubscribedRooms(headerAccessor, false);
+      if (subscribedRooms == null) return;
+
+      Set.copyOf(subscribedRooms).forEach(roomId -> {
+        this.processChatRoomActionType(roomId, username, MessageType.LEAVE);
+        log.info("{} has unsubscribed from room: {}", username, roomId);
+      });
+      subscribedRooms.clear();
     }
   }
 
@@ -71,12 +89,16 @@ public class WebSocketEventListener {
     StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(subscribeEvent.getMessage());
 
     if (headerAccessor.getDestination() != null && headerAccessor.getDestination().contains("/topic/chat/room/")) {
-      ChatMessage chatMessageProcessed = this.processChatRoomActionType(headerAccessor, MessageType.JOIN);
+      String roomId = extractRoomId(headerAccessor);
+      Set<String> subscribedRooms = getSubscribedRooms(headerAccessor, true);
+      if (subscribedRooms == null) return;
+      if (subscribedRooms.contains(roomId)) {
+        log.debug("Ignoring duplicate subscription to room {}", roomId);
+        return;
+      }
 
-      headerAccessor.getSessionAttributes().computeIfAbsent("subscribedChatRooms", k -> new HashMap<String, String>());
-      @SuppressWarnings("unchecked")
-      HashMap<String, String> subscribedRooms = (HashMap<String, String>) headerAccessor.getSessionAttributes().get("subscribedChatRooms");
-      subscribedRooms.put(chatMessageProcessed.getRoomId(), chatMessageProcessed.getRoomId());
+      ChatMessage chatMessageProcessed = this.processChatRoomActionType(headerAccessor, MessageType.JOIN);
+      subscribedRooms.add(chatMessageProcessed.getRoomId());
 
       log.info(headerAccessor.getSessionAttributes().get("username") + " has subscribed to room: " + chatMessageProcessed.getRoomId());
     }
@@ -87,10 +109,14 @@ public class WebSocketEventListener {
     StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
     if (headerAccessor.getDestination() != null && headerAccessor.getDestination().contains("/topic/chat/room/")) {
-      ChatMessage chatMessageProcessed = this.processChatRoomActionType(headerAccessor, MessageType.LEAVE);
+      String roomId = extractRoomId(headerAccessor);
+      Set<String> subscribedRooms = getSubscribedRooms(headerAccessor, false);
+      if (subscribedRooms == null || !subscribedRooms.contains(roomId)) {
+        log.debug("Ignoring duplicate unsubscribe from room {}", roomId);
+        return;
+      }
 
-      @SuppressWarnings("unchecked")
-      HashMap<String, String> subscribedRooms = (HashMap<String, String>) headerAccessor.getSessionAttributes().get("subscribedChatRooms");
+      ChatMessage chatMessageProcessed = this.processChatRoomActionType(headerAccessor, MessageType.LEAVE);
       subscribedRooms.remove(chatMessageProcessed.getRoomId());
 
       log.info(headerAccessor.getSessionAttributes().get("username") + " has unsubscribed from room: " + chatMessageProcessed.getRoomId());
@@ -101,6 +127,10 @@ public class WebSocketEventListener {
     List<MessageType> allowedActions = List.of(MessageType.JOIN, MessageType.LEAVE);
     if (!allowedActions.contains(messageType))
       throw new IllegalArgumentException("Invalid message type. Only JOIN and LEAVE are allowed");
+    if (userId == null || userId.isBlank())
+      throw new IllegalArgumentException("A connected user is required for room membership events");
+
+    roomService.findById(roomId);
 
     ChatMessage chatMessagePersisted = chatMessageService.save(ChatMessage.builder()
       .type(messageType)
@@ -116,8 +146,27 @@ public class WebSocketEventListener {
   }
 
   private ChatMessage processChatRoomActionType(StompHeaderAccessor headerAccessor, MessageType messageType) {
-    String roomId = headerAccessor.getDestination().split("/topic/chat/room/")[1];
+    String roomId = extractRoomId(headerAccessor);
     String userId = (String) headerAccessor.getSessionAttributes().get("username");
     return this.processChatRoomActionType(roomId, userId, messageType);
+  }
+
+  private String extractRoomId(StompHeaderAccessor headerAccessor) {
+    String destination = headerAccessor.getDestination();
+    if (destination == null || !destination.startsWith("/topic/chat/room/")) {
+      throw new IllegalArgumentException("Invalid chat room destination");
+    }
+    String roomId = destination.substring("/topic/chat/room/".length());
+    if (roomId.isBlank()) throw new IllegalArgumentException("Room id is required");
+    return roomId;
+  }
+
+  @SuppressWarnings("unchecked")
+  private Set<String> getSubscribedRooms(StompHeaderAccessor headerAccessor, boolean create) {
+    if (headerAccessor.getSessionAttributes() == null) return null;
+    if (create) {
+      headerAccessor.getSessionAttributes().computeIfAbsent("subscribedChatRooms", key -> ConcurrentHashMap.<String>newKeySet());
+    }
+    return (Set<String>) headerAccessor.getSessionAttributes().get("subscribedChatRooms");
   }
 }

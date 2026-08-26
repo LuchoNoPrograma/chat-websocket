@@ -1,15 +1,24 @@
 package luis.fluoxetina.chatwebsocket.model.repository;
 
 import luis.fluoxetina.chatwebsocket.model.doc.Room;
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.mongodb.repository.Update;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-//Atomic operations with MongoDB: keyword $inc
-//References: https://docs.spring.io/spring-data/mongodb/reference/mongodb/repositories/modifying-methods.html
-public interface RoomRepository extends MongoRepository<Room, String> {
-  @Query("{'_id': ?0}")
-  @Update("{'$inc': {'activeUsers': 1}}")
-  void findAndIncrementActiveUsersById(ObjectId roomId);
+public interface RoomRepository extends JpaRepository<Room, String> {
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
+  @Query("update Room room set room.activeUsers = coalesce(room.activeUsers, 0) + 1 where room.id = :roomId")
+  int incrementActiveUsers(@Param("roomId") String roomId);
+
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
+  @Query("""
+    update Room room
+    set room.activeUsers = case
+      when coalesce(room.activeUsers, 0) > 0 then room.activeUsers - 1
+      else 0
+    end
+    where room.id = :roomId
+    """)
+  int decrementActiveUsers(@Param("roomId") String roomId);
 }

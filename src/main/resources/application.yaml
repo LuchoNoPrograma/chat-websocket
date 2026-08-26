@@ -1,6 +1,30 @@
 server:
-  port: 8081
+  port: ${PORT:8081}
 
 spring:
   profiles:
     default: dev
+  datasource:
+    url: jdbc:h2:mem:chatwebsocket;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    defer-datasource-initialization: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+  sql:
+    init:
+      mode: always
+  h2:
+    console:
+      enabled: false
+
+app:
+  cors:
+    allowed-origins: ${CHAT_ALLOWED_ORIGINS:http://localhost:8080,http://127.0.0.1:8080}
+  data-reset:
+    idle-timeout: PT30M
+    check-interval-ms: 60000
+    initial-delay-ms: 60000
