@@ -31,41 +31,38 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class WebSocketEventListener {
   private final SimpMessagingTemplate messagingTemplate;
   private final UserService userService;
+  private final luis.fluoxetina.chatwebsocket.session.SessionGeneration generation;
   private final RoomService roomService;
   private final ChatMessageService chatMessageService;
 
   private final UserMapper userMapper;
   private final RoomMapper roomMapper;
   private final ChatMessageMapper chatMessageMapper;
-  private final ConcurrentHashMap<String, Integer> connectedSessions = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, String> connectedSessions = new ConcurrentHashMap<>();
 
   @EventListener
   public void handleWebsocketConnect(SessionConnectEvent event){
     StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-    String username = headerAccessor.getLogin() == null ? null : headerAccessor.getLogin().trim();
-    if (username == null || username.isBlank()) {
-      throw new IllegalArgumentException("A username is required to connect");
+    if (headerAccessor.getUser() == null) throw new IllegalArgumentException("Authenticated session required");
+    String username = headerAccessor.getUser().getName();
+    if (headerAccessor.getSessionId() == null) return;
+    if (connectedSessions.putIfAbsent(headerAccessor.getSessionId(), username) == null) {
+      var existing = userService.findByUsername(username);
+      var user = userService.connect(username, existing.getAvatarId());
+      messagingTemplate.convertAndSend("/topic/user", userMapper.toDto(user));
     }
-
-    headerAccessor.setUser(() -> username);
-    headerAccessor.getSessionAttributes().put("username", username);
-    connectedSessions.merge(username, 1, Integer::sum);
   }
 
   @EventListener
   public void handleWebSocketDisconnected(SessionDisconnectEvent event) {
     StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-    String username = (String) headerAccessor.getSessionAttributes().get("username");
-
+    if (headerAccessor.getSessionId() == null) return;
+    String username = connectedSessions.remove(headerAccessor.getSessionId());
+    var attributes = headerAccessor.getSessionAttributes();
+    if (attributes == null || !generation.current().equals(attributes.get("generation"))) return;
     if (username != null) {
       log.info("User Disconnected: {}", username);
-      AtomicInteger remainingSessions = new AtomicInteger();
-      connectedSessions.compute(username, (key, count) -> {
-        int remaining = count == null ? 0 : Math.max(0, count - 1);
-        remainingSessions.set(remaining);
-        return remaining == 0 ? null : remaining;
-      });
-      if (remainingSessions.get() == 0) {
+      if (!connectedSessions.containsValue(username)) {
         try {
           User user = userService.disconnect(username);
           messagingTemplate.convertAndSend("/topic/user", userMapper.toDto(user));

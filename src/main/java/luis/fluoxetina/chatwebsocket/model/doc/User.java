@@ -20,5 +20,7 @@ public class User {
   private String username;
 
   private boolean online;
+  @Column(length = 20)
+  private String avatarId;
   private ZonedDateTime createdAt;
 }

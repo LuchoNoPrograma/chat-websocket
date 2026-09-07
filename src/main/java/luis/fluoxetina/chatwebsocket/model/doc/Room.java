@@ -56,6 +56,4 @@ public class Room {
   @Transient
   private List<User> users;
 
-  @Transient
-  private List<ChatMessage> chatMessages;
 }

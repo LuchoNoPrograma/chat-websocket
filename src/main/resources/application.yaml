@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:8081}
+  port: ${PORT:7071}
 
 spring:
   profiles:
@@ -23,8 +23,21 @@ spring:
 
 app:
   cors:
-    allowed-origins: ${CHAT_ALLOWED_ORIGINS:http://localhost:8080,http://127.0.0.1:8080}
+    allowed-origins: ${CHAT_ALLOWED_ORIGINS:http://localhost:7070,http://127.0.0.1:7070}
   data-reset:
     idle-timeout: PT30M
     check-interval-ms: 60000
     initial-delay-ms: 60000
+  user-session:
+    idle-timeout: PT15M
+    warning-before: PT2M
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true

@@ -9,11 +9,15 @@ import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class UserService {
+  private static final String DEFAULT_AVATAR_ID = "claudia";
+  private static final Set<String> AVATAR_IDS = Set.of(DEFAULT_AVATAR_ID, "sol", "luna", "jimenez", "dickson", "kimi");
+
   private final UserRepository userRepository;
 
   public User findByUsername(String username) throws EntityNotFoundException{
@@ -25,6 +29,7 @@ public class UserService {
     try {
       storedUser = findByUsername(user.getUsername());
       storedUser.setOnline(true);
+      storedUser.setAvatarId(normalizeAvatarId(user.getAvatarId()));
       userRepository.save(storedUser);
     } catch (EntityNotFoundException e) {
       storedUser = createUser(user);
@@ -33,15 +38,22 @@ public class UserService {
   }
 
   public User connect(String username) {
+    return connect(username, DEFAULT_AVATAR_ID);
+  }
+
+  public User connect(String username, String avatarId) {
     User storedUser;
+    String cleanAvatarId = normalizeAvatarId(avatarId);
     try {
       storedUser = findByUsername(username);
       storedUser.setOnline(true);
+      storedUser.setAvatarId(cleanAvatarId);
       userRepository.save(storedUser);
     } catch (EntityNotFoundException e) {
       storedUser = createUser(User.builder()
         .username(username)
         .online(true)
+        .avatarId(cleanAvatarId)
         .createdAt(ZonedDateTime.now())
         .build());
     }
@@ -61,7 +73,12 @@ public class UserService {
 
   public User createUser(User user) {
     user.setOnline(true);
+    user.setAvatarId(normalizeAvatarId(user.getAvatarId()));
     return userRepository.save(user);
+  }
+
+  private String normalizeAvatarId(String avatarId) {
+    return AVATAR_IDS.contains(avatarId) ? avatarId : DEFAULT_AVATAR_ID;
   }
 
   public List<User> findAllByOnline(boolean online) {

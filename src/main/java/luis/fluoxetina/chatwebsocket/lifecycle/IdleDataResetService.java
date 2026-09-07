@@ -18,6 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Service
 @Log4j2
 public class IdleDataResetService {
+  private final luis.fluoxetina.chatwebsocket.session.SessionGeneration generation;
   private final JdbcTemplate jdbcTemplate;
   private final DataSource dataSource;
   private final TransactionTemplate transactionTemplate;
@@ -25,10 +26,11 @@ public class IdleDataResetService {
   private final AtomicLong lastActivityNanos = new AtomicLong(System.nanoTime());
   private final ReentrantLock resetLock = new ReentrantLock();
 
-  public IdleDataResetService(JdbcTemplate jdbcTemplate,
+  public IdleDataResetService(luis.fluoxetina.chatwebsocket.session.SessionGeneration generation, JdbcTemplate jdbcTemplate,
                               DataSource dataSource,
                               TransactionTemplate transactionTemplate,
                               @Value("${app.data-reset.idle-timeout:PT30M}") Duration idleTimeout) {
+    this.generation = generation;
     this.jdbcTemplate = jdbcTemplate;
     this.dataSource = dataSource;
     this.transactionTemplate = transactionTemplate;
@@ -51,6 +53,7 @@ public class IdleDataResetService {
     try {
       if (!hasExceededIdleTimeout()) return;
       transactionTemplate.executeWithoutResult(status -> restoreInitialData());
+      generation.rotate();
       lastActivityNanos.set(System.nanoTime());
       log.info("In-memory chat data restored after the inactivity timeout");
     } finally {
@@ -60,6 +63,8 @@ public class IdleDataResetService {
 
   private void restoreInitialData() {
     jdbcTemplate.update("DELETE FROM chat_room_tags");
+    jdbcTemplate.update("DELETE FROM chat_message_reads");
+    jdbcTemplate.update("DELETE FROM chat_message_deliveries");
     jdbcTemplate.update("DELETE FROM chat_messages");
     jdbcTemplate.update("DELETE FROM chat_rooms");
     jdbcTemplate.update("DELETE FROM room_tags");

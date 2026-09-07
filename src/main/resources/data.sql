@@ -16,9 +16,9 @@ INSERT INTO chat_users (username, online, created_at) VALUES
   ('vale', FALSE, CURRENT_TIMESTAMP);
 
 INSERT INTO chat_rooms (id, name, description, active_users, img_portrait, created_at) VALUES
-  ('room-cero-contexto', 'Cero contexto', 'La general pa hablar de lo que salga: música, memes, chisme sano y preguntas random.', 0, NULL, CURRENT_TIMESTAMP),
-  ('room-dev-chill', 'Dev & chill', 'Código, proyectos y bugs; cero entrevista técnica, puro compartir.', 0, NULL, CURRENT_TIMESTAMP),
-  ('room-busco-parche', 'Busco parche', 'Pa conocer gente, encontrar tu misma vibra y dejar de lurkear.', 0, NULL, CURRENT_TIMESTAMP);
+  ('room-cero-contexto', 'Cero contexto', '¿Esto va aquí? Sí. Música, memes y cosas que no sabías a quién contarle.', 0, NULL, CURRENT_TIMESTAMP),
+  ('room-dev-chill', 'Dev & chill', 'Comparte lo que estás haciendo o ese error que ya leíste veinte veces.', 0, NULL, CURRENT_TIMESTAMP),
+  ('room-busco-parche', '¿Sale algo?', 'Una partida, una peli o hablar un rato. Propón un plan y ve quién se suma.', 0, NULL, CURRENT_TIMESTAMP);
 
 INSERT INTO chat_room_tags (room_id, tag_id) VALUES
   ('room-cero-contexto', 'tag-conversaciones'),
@@ -27,9 +27,9 @@ INSERT INTO chat_room_tags (room_id, tag_id) VALUES
   ('room-busco-parche', 'tag-conversaciones');
 
 INSERT INTO chat_messages (id, room_id, user_id, body, type, format, created_at) VALUES
-  ('msg-cero-contexto-1', 'room-cero-contexto', 'luna', 'holaa, pregunta seria: ¿qué canción tienen pegada últimamente? 👀', 'CHAT', 'TEXT', DATEADD('MINUTE', -6, CURRENT_TIMESTAMP)),
-  ('msg-cero-contexto-2', 'room-cero-contexto', 'mika', 'yo vine a mirar dos minutos y ya me quedé, clásico jsjs', 'CHAT', 'TEXT', DATEADD('MINUTE', -5, CURRENT_TIMESTAMP)),
-  ('msg-dev-chill-1', 'room-dev-chill', 'nico.dev', 'ando armando una app y necesito ojos que me digan si está god o si me estoy mintiendo 😭', 'CHAT', 'TEXT', DATEADD('MINUTE', -4, CURRENT_TIMESTAMP)),
-  ('msg-dev-chill-2', 'room-dev-chill', 'santi', 'pásala, acá revisamos sin entrevista técnica. yo ando peleando con Vue y Spring', 'CHAT', 'TEXT', DATEADD('MINUTE', -3, CURRENT_TIMESTAMP)),
-  ('msg-busco-parche-1', 'room-busco-parche', 'vale', 'holi, soy nueva por acá. busco gente pa hablar de música, pelis y cualquier bobada', 'CHAT', 'TEXT', DATEADD('MINUTE', -2, CURRENT_TIMESTAMP)),
-  ('msg-busco-parche-2', 'room-busco-parche', 'mika', 'caíste bien jaja. ¿team plan tranqui o salir a tocar pasto?', 'CHAT', 'TEXT', DATEADD('MINUTE', -1, CURRENT_TIMESTAMP));
+  ('msg-cero-contexto-1', 'room-cero-contexto', 'luna', 'llevo todo el día con la misma canción. pasen algo antes de que la odie', 'CHAT', 'TEXT', DATEADD('MINUTE', -6, CURRENT_TIMESTAMP)),
+  ('msg-cero-contexto-2', 'room-cero-contexto', 'mika', 'cuál es? necesito saber si ya estoy igual', 'CHAT', 'TEXT', DATEADD('MINUTE', -5, CURRENT_TIMESTAMP)),
+  ('msg-dev-chill-1', 'room-dev-chill', 'nico.dev', 'arreglé el bug y ahora no sé por qué funciona 😭', 'CHAT', 'TEXT', DATEADD('MINUTE', -4, CURRENT_TIMESTAMP)),
+  ('msg-dev-chill-2', 'room-dev-chill', 'santi', 'pasa el diff, ahora necesito saber qué cambiaste', 'CHAT', 'TEXT', DATEADD('MINUTE', -3, CURRENT_TIMESTAMP)),
+  ('msg-busco-parche-1', 'room-busco-parche', 'vale', 'alguien para una partida esta noche? aviso que juego mal pero me conecto puntual', 'CHAT', 'TEXT', DATEADD('MINUTE', -2, CURRENT_TIMESTAMP)),
+  ('msg-busco-parche-2', 'room-busco-parche', 'mika', 'yo estoy. con lo de puntual ya me ganaste, a qué jugamos?', 'CHAT', 'TEXT', DATEADD('MINUTE', -1, CURRENT_TIMESTAMP));

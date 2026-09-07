@@ -34,5 +34,4 @@ public class RoomDto {
   @NotNull
   private List<TagDto> tags;
   private List<UserDto> users;
-  private List<ChatMessageDto> chatMessages;
 }

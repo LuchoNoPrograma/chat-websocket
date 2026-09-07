@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RoomMapper {
   private final UserMapper userMapper;
-  private final ChatMessageMapper chatMessageMapper;
   private final TagMapper topicMapper;
 
   public RoomDto toDto(Room room) {
@@ -41,27 +40,6 @@ public class RoomMapper {
     if (room.getUsers() != null) {
       roomDto.setUsers(room.getUsers().stream().map(userMapper::toDto).toList());
     }
-    return roomDto;
-  }
-
-  public RoomDto toDtoWithChatMessages(Room room) {
-    RoomDto roomDto = toDto(room);
-    if (room.getChatMessages() != null) {
-      roomDto.setChatMessages(room.getChatMessages().stream().map(chatMessageMapper::toDto).toList());
-    }
-
-    return roomDto;
-  }
-
-  public RoomDto toDtoWithChatMessagesAndUsers(Room room) {
-    RoomDto roomDto = toDtoWithChatMessages(room);
-    if (room.getUsers() != null) {
-      roomDto.setUsers(room.getUsers().stream().map(userMapper::toDto).toList());
-    }
-    if(room.getChatMessages() != null) {
-      roomDto.setChatMessages(room.getChatMessages().stream().map(chatMessageMapper::toDto).toList());
-    }
-
     return roomDto;
   }
 

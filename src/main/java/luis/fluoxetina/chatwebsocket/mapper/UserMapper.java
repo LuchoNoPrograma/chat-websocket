@@ -10,6 +10,7 @@ public class UserMapper {
     return UserDto.builder()
       .username(user.getUsername())
       .online(user.isOnline())
+      .avatarId(user.getAvatarId())
       .build();
   }
 
@@ -17,6 +18,7 @@ public class UserMapper {
     return User.builder()
       .username(userDto.getUsername())
       .online(userDto.isOnline())
+      .avatarId(userDto.getAvatarId())
       .build();
   }
 }

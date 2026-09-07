@@ -1,0 +1,7 @@
+.git
+.idea
+target
+src/chat-frontend/node_modules
+src/chat-frontend/dist
+src/chat-frontend/.env.local
+*.log

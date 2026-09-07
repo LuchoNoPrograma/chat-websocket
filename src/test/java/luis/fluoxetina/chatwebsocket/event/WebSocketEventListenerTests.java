@@ -57,6 +57,7 @@ class WebSocketEventListenerTests {
     listener = new WebSocketEventListener(
       messagingTemplate,
       userService,
+      new luis.fluoxetina.chatwebsocket.session.SessionGeneration(),
       roomService,
       chatMessageService,
       userMapper,

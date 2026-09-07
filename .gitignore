@@ -8,6 +8,9 @@ output/playwright/
 src/chat-frontend/dist/**
 src/chat-frontend/node_modules/**
 src/chat-frontend/node
+src/chat-frontend/.env
+src/chat-frontend/.env.*
+!src/chat-frontend/.env.example
 src/chat-frontend/.idea
 src/chat-frontend/*.iws
 src/chat-frontend/*.iml

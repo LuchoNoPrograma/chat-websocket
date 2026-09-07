@@ -11,10 +11,19 @@ export default defineConfig({
     }
   },
   server: {
-    port: 8080
+    port: 7070,
+    proxy: {
+      '/api': 'http://localhost:7071',
+      '/ws-chatapp': {
+        target: 'http://localhost:7071',
+        ws: true
+      }
+    }
   },
   build: {
     target: 'es2022',
-    sourcemap: true
+    outDir: '../../target/frontend-dist',
+    emptyOutDir: true,
+    sourcemap: false
   }
 });
