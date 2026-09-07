@@ -1,8 +1,8 @@
 # Chatty
 
-Chat de texto en tiempo real con salas públicas, conversaciones directas, respuestas con cita y confirmaciones de entrega y lectura. Desarrollado con **Vue, TypeScript y Spring Boot**, con comunicación REST/STOMP y almacenamiento temporal en H2.
+Chat de texto en tiempo real con salas públicas, conversaciones directas, respuestas con cita y confirmaciones de entrega y lectura. Desarrollado con **Vue, TypeScript y Spring Boot**, con comunicación REST/STOMP y almacenamiento temporal en H2. **Dockerizado:** frontend y backend se compilan y ejecutan juntos en un único contenedor.
 
-**[Ejecutar en local](#instalación)** · **[Arquitectura detallada](docs/chat-architecture.md)**
+**[Ejecutar con Docker](#ejecutar-con-docker)** · **[Ejecutar con Java](#ejecutar-con-java-sin-docker)** · **[Arquitectura detallada](docs/chat-architecture.md)**
 
 ![Chatty en escritorio: sala Café y código con mensajes y confirmaciones de lectura](docs/capturas/sala-escritorio.png)
 
@@ -37,12 +37,7 @@ El formulario valida un alias de 3 a 20 caracteres y permite seleccionar una de 
 - Cerrar sesión revoca la credencial y termina sus conexiones.
 - Los aliases usados quedan reservados hasta el reinicio de los datos para evitar que otra sesión herede sus conversaciones.
 
-<details>
-<summary>Ver pantalla de acceso</summary>
-
 ![Acceso con alias y selección de foto de perfil](docs/capturas/acceso.png)
-
-</details>
 
 ### 2. Salas y presencia
 
@@ -50,12 +45,7 @@ El directorio permite buscar salas, consultar cuántas personas están conectada
 
 En escritorio, el directorio permanece junto al chat. En móvil se abre como un panel y se cierra al seleccionar una conversación. Las confirmaciones de navegación aparecen como avisos temporales.
 
-<details>
-<summary>Ver creación de una sala</summary>
-
 ![Diálogo de creación de sala con nombre y descripción](docs/capturas/crear-sala.png)
-
-</details>
 
 <p>
   <img src="docs/capturas/directorio-movil.png" alt="Directorio de salas y presencia en móvil" width="300">
@@ -71,12 +61,7 @@ Desde **Personas** se abre una conversación entre dos usuarios. El backend comp
 - Textos extensos plegados mediante **Leer más** y **Ver menos**.
 - Historial paginado y combinación de mensajes REST con eventos en vivo, sin duplicarlos por ID.
 
-<details>
-<summary>Ver conversación directa con cita y texto largo</summary>
-
 ![Conversación directa con respuesta citada y mensaje largo plegado](docs/capturas/directo.png)
-
-</details>
 
 ### 4. Entrega, lectura y detalles
 
@@ -95,12 +80,7 @@ Un texto largo debe expandirse y mostrar su final para confirmar lectura. Las fe
   <img src="docs/capturas/texto-largo-movil.png" alt="Mensaje largo expandido en el tema oscuro para móvil" width="300">
 </p>
 
-<details>
-<summary>Ver detalles en escritorio</summary>
-
 ![Información de un mensaje con confirmaciones por persona](docs/capturas/detalles-mensaje.png)
-
-</details>
 
 ### 5. Reconexión y mensajes pendientes
 
@@ -112,16 +92,13 @@ La reconexión valida la sesión, restablece suscripciones y recupera el histori
 
 Ambos temas comparten el color de acento, la identidad visual y los controles. El logo y el favicon cuentan con variantes acordes al tema.
 
-<details>
-<summary>Ver el chat en modo noche</summary>
-
 ![Sala de Chatty en modo oscuro](docs/capturas/sala-noche.png)
-
-</details>
 
 ## Arquitectura
 
 El proyecto se organiza como un **monolito fullstack**. En desarrollo, Vite sirve Vue y redirige las peticiones al backend. Al empaquetar, Spring Boot sirve la interfaz, REST y WebSocket desde un único JAR y puerto.
+
+El [Dockerfile](Dockerfile) usa dos etapas: la primera compila el proyecto con Maven, incluyendo el frontend y las pruebas; la segunda ejecuta el JAR con Java 17 y un usuario sin privilegios de root. H2 está embebida en el proceso, por lo que no hace falta otro contenedor de base de datos ni Docker Compose.
 
 ```mermaid
 flowchart LR
@@ -256,15 +233,36 @@ Las credenciales y la generación de sesión se mantienen en memoria del servido
 
 ## Instalación
 
-### Requisitos
+### Ejecutar con Docker
+
+Necesitas **Docker instalado y en ejecución**, Git y acceso a internet para descargar las imágenes y dependencias. No necesitas instalar Java, Maven ni Node.js en tu equipo.
+
+Desde una terminal:
+
+```bash
+git clone https://github.com/LuchoNoPrograma/chat-websocket.git
+cd chat-websocket
+docker build -t chatty:local .
+docker run --rm --name chatty -p 7071:7071 chatty:local
+```
+
+Si ya tienes el repositorio, empieza por `docker build` desde su raíz. La primera compilación puede tardar varios minutos.
+
+Cuando termine de arrancar, abre **[localhost:7071](http://localhost:7071)**. Ese único contenedor sirve la interfaz, REST y WebSocket, e inicializa H2 con las salas de `data.sql`. No hace falta iniciar Vite ni configurar variables de entorno para probarlo.
+
+Para detenerlo, pulsa `Ctrl+C` o ejecuta `docker stop chatty` desde otra terminal. Con `--rm`, Docker elimina el contenedor al detenerlo y conserva la imagen; puedes volver a iniciarlo con el mismo comando `docker run`. Los datos del chat se pierden al detener el proceso porque H2 vive en memoria.
+
+Si el puerto `7071` está ocupado, usa `-p 7171:7071` y abre `http://localhost:7171`. Para ejecutar cambios del código, vuelve a construir la imagen y arranca un nuevo contenedor.
+
+### Ejecutar con Java, sin Docker
+
+Requisitos:
 
 - JDK 17 y Git.
 - Acceso a internet para descargar dependencias durante la primera compilación.
 - Para trabajar con Vite por separado: Node.js 22.13 o superior de la rama 22 y npm.
 
 Maven Wrapper está incluido. La compilación Maven instala su propia versión de Node y npm para construir el frontend; no requiere instalarlos globalmente para ejecutar el JAR.
-
-### Ejecutar la aplicación completa
 
 ```bash
 git clone https://github.com/LuchoNoPrograma/chat-websocket.git
@@ -298,12 +296,15 @@ Abre **[localhost:7070](http://localhost:7070)**. Vite redirige `/api` y `/ws-ch
 | Variable o propiedad | Valor predeterminado | Uso |
 | --- | --- | --- |
 | `PORT` | `7071` | Puerto de Spring Boot. |
+| `SPRING_PROFILES_ACTIVE` | `dev` | Perfil de Spring utilizado por el contenedor. |
 | `CHAT_ALLOWED_ORIGINS` | `http://localhost:7070,http://127.0.0.1:7070` | Orígenes permitidos, separados por comas. |
 | `VITE_BACKEND_URL` | Mismo origen si está vacía | URL base que utiliza el cliente para REST y SockJS. Se fija al compilar. |
 | `app.data-reset.idle-timeout` | `PT30M` | Inactividad global antes de restaurar los datos. |
 | `app.user-session.token-ttl` | `PT2H` | Duración máxima de la credencial. |
 
 Las propiedades Spring se pueden pasar al JAR; por ejemplo, `--server.port=7171`. Si cambias el origen del frontend, actualiza la lista de orígenes permitidos. Para publicar la aplicación, configura HTTPS/WSS y permite el origen público. El empaquetado está preparado para servir una instancia completa.
+
+En Docker, pasa las variables con `-e`, por ejemplo `-e SPRING_PROFILES_ACTIVE=prod`. Los perfiles `dev` y `prod` mantienen H2 en memoria; seleccionar `prod` no activa persistencia ni configura HTTPS. `-p 7171:7071` cambia el puerto de acceso en tu equipo; si modificas `PORT`, debes ajustar también el puerto interno del mapeo. `VITE_BACKEND_URL` se fija durante la compilación del frontend, por lo que pasarla a `docker run` no cambia la interfaz ya construida.
 
 ## Cómo probar el proyecto
 
@@ -378,10 +379,13 @@ La salud del backend está disponible en [localhost:7071/actuator/health](http:/
 | Actuator y Micrometer | Salud y métricas del backend. |
 | JUnit, Spring Boot Test y Playwright | Pruebas de backend y comprobación del flujo en navegador. |
 | Maven Wrapper y frontend-maven-plugin | Construcción conjunta de frontend y backend en un JAR. |
+| Docker | Construcción en dos etapas y ejecución de la aplicación completa en un contenedor con Java 17. |
 
 ## Estructura del código
 
 ```text
+Dockerfile                          # Compilación y ejecución en dos etapas
+.dockerignore                       # Exclusiones del contexto de construcción
 src/
 ├── chat-frontend/
 │   ├── public/                     # Fotos de perfil, marca y favicon
